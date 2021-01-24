@@ -1,0 +1,27 @@
+INSERT INTO applications (keyName, name) VALUES ('CHUMS', 'CHUMS');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('CHUMS', 'ChumsApi');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('CHUMS', 'MembershipApi');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('CHUMS', 'GivingApi');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('CHUMS', 'AttendanceApi');
+
+INSERT INTO applications (keyName, name) VALUES ('AccessManagement', 'Access Management');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('AccessManagement', 'AccessApi');
+
+INSERT INTO applications (keyName, name) VALUES ('B1', 'B1 Church');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('B1', 'B1Api');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('B1', 'GivingApi');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('B1', 'AttendanceApi');
+
+INSERT INTO applications (keyName, name) VALUES ('StreamingLive', 'Streaming Live');
+INSERT INTO applicationApis (applicationName, apiName) VALUES ('StreamingLive', 'StreamingLiveApi');
+
+INSERT INTO roles (churchId, appName, name) VALUES (0, 'AccessManagement', 'Server Admins');
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'Server', 'Admin' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'Roles', 'Edit' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'Roles', 'View' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'RoleMembers', 'Edit' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'RoleMembers', 'View' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'RolePermissions', 'Edit' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'RolePermissions', 'View' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'Users', 'Edit' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';
+INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, action) SELECT 0, id, 'AccessApi', 'Users', 'View' FROM roles WHERE appName='AccessManagement' AND name='Server Admins';

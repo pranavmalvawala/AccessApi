@@ -1,0 +1,72 @@
+import { controller, httpPost, httpGet, requestParam, httpDelete } from "inversify-express-utils";
+import { Role } from "../models";
+import express from "express";
+import { AuthenticatedUser } from '../auth';
+import { AccessBaseController } from "./AccessBaseController"
+
+@controller("/roles")
+export class RoleController extends AccessBaseController {
+
+    @httpGet("/app/:appName")
+    public async loadAll(@requestParam("appName") appName: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+        return this.actionWrapper(req, res, async (au) => {
+            const roles = await this.repositories.role.loadByAppName(appName, au.churchId);
+            const hasAccess = await this.checkAccess(roles, "Roles", "View", au);
+            if (!hasAccess) return this.json({}, 401);
+            else return this.json(roles, 200);
+        });
+    }
+
+    @httpGet("/:id")
+    public async loadById(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+        return this.actionWrapper(req, res, async (au) => {
+            const role: Role = await this.repositories.role.loadById(au.churchId, id);
+            const roles: Role[] = [role];
+            const hasAccess = await this.checkAccess(roles, "Roles", "View", au);
+            if (!hasAccess) return this.json({}, 401);
+            else return this.json(role, 200);
+        });
+    }
+
+    @httpPost("/")
+    public async save(req: express.Request<{}, {}, Role[]>, res: express.Response): Promise<any> {
+        return this.actionWrapper(req, res, async (au) => {
+            if (!au.checkAccess('Roles', 'Edit')) return this.json({}, 401);
+            else {
+                let roles: Role[] = req.body;
+                const promises: Promise<Role>[] = [];
+                roles.forEach((role) => {
+                    role.churchId = au.churchId;
+                    promises.push(this.repositories.role.save(role));
+                });
+                roles = await Promise.all(promises);
+                return this.json(roles, 200);
+            }
+        });
+    }
+
+    @httpDelete("/:id")
+    public async delete(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+        return this.actionWrapper(req, res, async (au) => {
+            const role: Role = await this.repositories.role.loadById(au.churchId, id);
+            const roles: Role[] = [role];
+            if (!this.checkAccess(roles, 'Roles', 'Edit', au)) return this.json({}, 401);
+            else {
+                await this.repositories.rolePermission.deleteForRole(au.churchId, id);
+                await this.repositories.roleMember.deleteForRole(au.churchId, id);
+                await new Promise(resolve => setTimeout(resolve, 500)); // I think it takes a split second for the FK restraints to see the members were deleted sometimes and the delete below fails if I don't wait.
+                await this.repositories.role.delete(au.churchId, id);
+                return this.json([], 200);
+            }
+        });
+    }
+
+    private async checkAccess(roles: Role[], contentType: string, action: string, au: AuthenticatedUser) {
+        const hasAccess = au.checkAccess(contentType, action);
+        if (hasAccess && au.apiName !== "AccessManagement") {
+            // roles.forEach(r => { if (r.appName !== au.appName) hasAccess = false; })
+        }
+        return hasAccess;
+    }
+
+}

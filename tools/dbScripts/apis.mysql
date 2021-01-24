@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS `apis`;
+
+CREATE TABLE `apis` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `keyName` VARCHAR(45) NULL,
+  `name` VARCHAR(255) NULL,
+  PRIMARY KEY (`id`));

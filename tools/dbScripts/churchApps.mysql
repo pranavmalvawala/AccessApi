@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS `churchApps`;
+
+CREATE TABLE `churchApps` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `churchId` INT NULL,
+  `appName` VARCHAR(45) NULL,
+  `registrationDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

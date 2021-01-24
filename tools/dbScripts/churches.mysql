@@ -1,0 +1,15 @@
+DROP TABLE IF EXISTS `churches`;
+
+CREATE TABLE `churches` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(255) DEFAULT NULL,
+  `subDomain` varchar(45) DEFAULT NULL,
+  `registrationDate` datetime DEFAULT CURRENT_TIMESTAMP,
+  `address1` varchar(255) DEFAULT NULL,
+  `address2` varchar(255) DEFAULT NULL,
+  `city` varchar(255) DEFAULT NULL,
+  `state` varchar(45) DEFAULT NULL,
+  `zip` varchar(45) DEFAULT NULL,
+  `country` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

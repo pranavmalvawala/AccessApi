@@ -1,0 +1,7 @@
+DROP TABLE IF EXISTS `applicationApis`;
+
+CREATE TABLE `applicationApis` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `applicationName` VARCHAR(45) NULL,
+  `apiName` VARCHAR(45) NULL,
+  PRIMARY KEY (`id`));
