@@ -20,11 +20,6 @@ INSERT INTO permissions (apiName, section, action, displaySection, displayAction
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('StreamingLiveApi', 'RoleMembers', 'View', 'Roles', 'View Members');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('StreamingLiveApi', 'RoleMembers', 'Edit', 'Roles', 'Edit Members');
 
-INSERT INTO apis (keyName, name) VALUES ('ChumsApi', 'CHUMS');
-INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('ChumsApi', 'Admin', 'Import', 'Admin', 'Import/Export');
-INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('ChumsApi', 'Admin', 'Edit Settings', 'Admin', 'Edit Settings');
-INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('ChumsApi', 'Site', 'Admin', 'Admin', 'Edit Site Settings');
-
 INSERT INTO apis (keyName, name) VALUES ('B1Api', 'B1');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('B1Api', 'Settings', 'Edit', 'Settings', 'Edit');
 
@@ -50,3 +45,4 @@ INSERT INTO permissions (apiName, section, action, displaySection, displayAction
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Attendance', 'Edit', 'Attendance', 'Edit');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Attendance', 'View', 'Attendance', 'View');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Attendance', 'View Summary', 'Attendance', 'View Summary');
+INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Admin', 'Edit Settings', 'Admin', 'Edit Settings');
