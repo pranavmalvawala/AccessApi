@@ -3,6 +3,7 @@ import { RoleMember, User } from "../models";
 import express from "express";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
+import { Permissions, IPermission } from '../helpers'
 
 @controller("/rolemembers")
 export class RoleMemberController extends AccessBaseController {
@@ -12,7 +13,7 @@ export class RoleMemberController extends AccessBaseController {
     public async loadByRole(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const members = await this.repositories.roleMember.loadByRoleId(id, au.churchId);
-            const hasAccess = await this.checkAccess(members, "RoleMembers", "View", au);
+            const hasAccess = await this.checkAccess(members, Permissions.roleMembers.view, au);
             if (!hasAccess) return this.json({}, 401);
             else {
                 if (this.include(req, "users")) {
@@ -39,7 +40,7 @@ export class RoleMemberController extends AccessBaseController {
     public async save(req: express.Request<{}, {}, RoleMember[]>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             let members: RoleMember[] = req.body;
-            const hasAccess = await this.checkAccess(members, "RoleMembers", "Edit", au);
+            const hasAccess = await this.checkAccess(members, Permissions.roleMembers.edit, au);
             if (!hasAccess) return this.json({}, 401);
             else {
                 const promises: Promise<RoleMember>[] = [];
@@ -73,7 +74,7 @@ export class RoleMemberController extends AccessBaseController {
     public async delete(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const member = await this.repositories.roleMember.loadById(id, au.churchId);
-            const hasAccess = await this.checkAccess([member], "RoleMembers", "View", au);
+            const hasAccess = await this.checkAccess([member], Permissions.roleMembers.view, au);
             if (!hasAccess) return this.json({}, 401);
             else {
                 await this.repositories.roleMember.delete(id, au.churchId);
@@ -82,8 +83,8 @@ export class RoleMemberController extends AccessBaseController {
         });
     }
 
-    private async checkAccess(members: RoleMember[], contentType: string, action: string, au: AuthenticatedUser) {
-        const hasAccess = au.checkAccess(contentType, action);
+    private async checkAccess(members: RoleMember[], permission: IPermission, au: AuthenticatedUser) {
+        const hasAccess = au.checkAccess(permission);
         /*
         if (hasAccess && au.apiName !== "AccessManagement") {
             const roleIds: number[] = [];

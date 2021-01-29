@@ -3,6 +3,7 @@ import { Role } from "../models";
 import express from "express";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
+import { Permissions, IPermission } from '../helpers'
 
 @controller("/roles")
 export class RoleController extends AccessBaseController {
@@ -11,7 +12,7 @@ export class RoleController extends AccessBaseController {
     public async loadAll(@requestParam("appName") appName: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const roles = await this.repositories.role.loadByAppName(appName, au.churchId);
-            const hasAccess = await this.checkAccess(roles, "Roles", "View", au);
+            const hasAccess = await this.checkAccess(roles, Permissions.roles.view, au);
             if (!hasAccess) return this.json({}, 401);
             else return this.json(roles, 200);
         });
@@ -22,7 +23,7 @@ export class RoleController extends AccessBaseController {
         return this.actionWrapper(req, res, async (au) => {
             const role: Role = await this.repositories.role.loadById(au.churchId, id);
             const roles: Role[] = [role];
-            const hasAccess = await this.checkAccess(roles, "Roles", "View", au);
+            const hasAccess = await this.checkAccess(roles, Permissions.roles.view, au);
             if (!hasAccess) return this.json({}, 401);
             else return this.json(role, 200);
         });
@@ -31,7 +32,7 @@ export class RoleController extends AccessBaseController {
     @httpPost("/")
     public async save(req: express.Request<{}, {}, Role[]>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
-            if (!au.checkAccess('Roles', 'Edit')) return this.json({}, 401);
+            if (!au.checkAccess(Permissions.roles.edit)) return this.json({}, 401);
             else {
                 let roles: Role[] = req.body;
                 const promises: Promise<Role>[] = [];
@@ -50,7 +51,7 @@ export class RoleController extends AccessBaseController {
         return this.actionWrapper(req, res, async (au) => {
             const role: Role = await this.repositories.role.loadById(au.churchId, id);
             const roles: Role[] = [role];
-            if (!this.checkAccess(roles, 'Roles', 'Edit', au)) return this.json({}, 401);
+            if (!this.checkAccess(roles, Permissions.roles.edit, au)) return this.json({}, 401);
             else {
                 await this.repositories.rolePermission.deleteForRole(au.churchId, id);
                 await this.repositories.roleMember.deleteForRole(au.churchId, id);
@@ -61,8 +62,8 @@ export class RoleController extends AccessBaseController {
         });
     }
 
-    private async checkAccess(roles: Role[], contentType: string, action: string, au: AuthenticatedUser) {
-        const hasAccess = au.checkAccess(contentType, action);
+    private async checkAccess(roles: Role[], permission: IPermission, au: AuthenticatedUser) {
+        const hasAccess = au.checkAccess(permission);
         if (hasAccess && au.apiName !== "AccessManagement") {
             // roles.forEach(r => { if (r.appName !== au.appName) hasAccess = false; })
         }
