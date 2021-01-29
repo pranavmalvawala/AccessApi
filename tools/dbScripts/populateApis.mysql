@@ -36,8 +36,8 @@ INSERT INTO permissions (apiName, section, action, displaySection, displayAction
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'Groups', 'View', 'Groups', 'View');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'Households', 'Edit', 'People', 'Edit Household');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'People', 'Edit', 'People', 'Edit');
-INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'People', 'Edit Notes', 'People', 'Edit Notes');
-INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'People', 'View Notes', 'People', 'View Notes');
+INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'Notes', 'Edit', 'People', 'Edit Notes');
+INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'Notes', 'View', 'People', 'View Notes');
 
 INSERT INTO apis (keyName, name) VALUES ('GivingApi', 'Giving');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('GivingApi', 'Donations', 'Edit', 'Donations', 'Edit');
@@ -49,4 +49,4 @@ INSERT INTO permissions (apiName, section, action, displaySection, displayAction
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Attendance', 'Edit', 'Attendance', 'Edit');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Attendance', 'View', 'Attendance', 'View');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Attendance', 'View Summary', 'Attendance', 'View Summary');
-INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Admin', 'Edit Settings', 'Admin', 'Edit Settings');
+INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('AttendanceApi', 'Settings', 'Edit', 'Admin', 'Edit Settings');
