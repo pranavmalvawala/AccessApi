@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
-import { Utils } from "../helpers";
+import { Utils, Permissions } from "../helpers";
 import { Repositories } from "../repositories";
 
 @controller("/churches")
@@ -14,7 +14,7 @@ export class ChurchController extends AccessBaseController {
   @httpGet("/all")
   public async loadAll(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      if (!au.checkAccess('Server', 'Admin')) return this.json({}, 401);
+      if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
       const data = await this.repositories.church.loadAll();
       const churches = this.repositories.church.convertAllToModel(data);
       return churches;
@@ -61,7 +61,7 @@ export class ChurchController extends AccessBaseController {
   public async get(@requestParam("id") id: number, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
       const churchId = parseInt(id.toString(), 0); // I think it's a float coming in and the comparisons fail.
-      let hasAccess = au.checkAccess("Server", "Admin") || au.churchId === churchId;
+      let hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
       if (!hasAccess) {
         const churches = await this.repositories.rolePermission.loadForUser(au.id, true);
         churches.forEach(c => { if (c.id === churchId) hasAccess = true; });
@@ -111,7 +111,7 @@ export class ChurchController extends AccessBaseController {
   @httpPost("/")
   public async save(req: express.Request<{}, {}, Church[]>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      if (!au.checkAccess('Settings', 'Edit')) return this.json({}, 401);
+      if (!au.checkAccess(Permissions.settings.edit)) return this.json({}, 401);
       else {
         const allErrors: string[] = [];
         let churches: Church[] = req.body;

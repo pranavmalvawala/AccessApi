@@ -3,6 +3,7 @@ import { RolePermission } from "../models";
 import express from "express";
 import { AccessBaseController } from "./AccessBaseController"
 import { AuthenticatedUser } from '../auth';
+import { Permissions, IPermission } from '../helpers'
 
 @controller("/rolepermissions")
 export class RolePermissionController extends AccessBaseController {
@@ -11,7 +12,7 @@ export class RolePermissionController extends AccessBaseController {
     public async loadByRole(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const permissions = await this.repositories.rolePermission.loadByRoleId(au.churchId, id);
-            const hasAccess = await this.checkAccess(permissions, "RolePermissions", "View", au);
+            const hasAccess = await this.checkAccess(permissions, Permissions.rolePermissions.view, au);
             if (!hasAccess) return this.json({}, 401);
             else {
                 return this.json(permissions, 200);
@@ -22,7 +23,7 @@ export class RolePermissionController extends AccessBaseController {
     @httpDelete("/:id")
     public async deletePermission(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
-            if (!au.checkAccess("RolePermissions", "Edit")) return this.json({}, 401);
+            if (!au.checkAccess(Permissions.rolePermissions.edit)) return this.json({}, 401);
             else {
                 await this.repositories.rolePermission.delete(au.churchId, id)
                 return this.json([], 200);
@@ -34,7 +35,7 @@ export class RolePermissionController extends AccessBaseController {
     @httpPost("/")
     public async save(req: express.Request<{}, {}, RolePermission[]>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
-            if (!au.checkAccess('RolePermissions', 'Edit')) return this.json({}, 401);
+            if (!au.checkAccess(Permissions.rolePermissions.edit)) return this.json({}, 401);
             else {
                 let rolePermissions: RolePermission[] = req.body;
                 const promises: Promise<RolePermission>[] = [];
@@ -49,8 +50,8 @@ export class RolePermissionController extends AccessBaseController {
     }
 
 
-    private async checkAccess(permissions: RolePermission[], contentType: string, action: string, au: AuthenticatedUser) {
-        const hasAccess = au.checkAccess(contentType, action);
+    private async checkAccess(permissions: RolePermission[], permission: IPermission, au: AuthenticatedUser) {
+        const hasAccess = au.checkAccess(permission);
         /*
         if (hasAccess) {
             const roleIds: number[] = [];
