@@ -40,3 +40,4 @@ jobs:
         run: |
           npm install
           npm run deploy-staging
+        
