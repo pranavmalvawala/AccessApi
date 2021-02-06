@@ -158,6 +158,8 @@ export class ChurchController extends AccessBaseController {
       if (errors.length > 0) return this.json({ errors }, 401);
       else {
 
+        const churchCount = await this.repositories.church.loadCount();
+
         // create the church
         let church: Church = { name: req.body.churchName, subDomain: req.body.subDomain };
         church = await this.repositories.church.save(church);
@@ -167,6 +169,9 @@ export class ChurchController extends AccessBaseController {
         const userUUID = uuidv4();
         let user: User = { email: req.body.email, displayName: req.body.displayName, password: hashedPass, authGuid: userUUID };
         user = await this.repositories.user.save(user);
+
+        // Add first user to server admins group
+        if (churchCount === 0) this.repositories.roleMember.save({ churchId: church.id, roleId: 1, userId: user.id, addedBy: user.id });
 
         // Add AccessManagement App
         let churchApp: ChurchApp = { churchId: church.id, appName: "AccessManagement", registrationDate: new Date() };

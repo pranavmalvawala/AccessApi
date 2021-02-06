@@ -2,6 +2,12 @@ import { DB } from "../apiBase/db";
 import { Church } from "../models";
 
 export class ChurchRepository {
+
+  public async loadCount() {
+    const data = await DB.queryOne("SELECT COUNT(*) as count FROM churches", []);
+    return parseInt(data.count, 0);
+  }
+
   public async loadAll() {
     return DB.query("SELECT * FROM churches ORDER BY name", []).then((rows: Church[]) => { return rows; });
   }
