@@ -5,12 +5,14 @@ RUN apk update && \
 
 WORKDIR /app
 
-COPY . .
+COPY ./package.json . 
 
 RUN git submodule init && git submodule update
 
 RUN npm install
 
-CMD npm run initdb && npm run dev
+COPY . .
+
+CMD npm run initdb && npm run start
 
 EXPOSE 8082
