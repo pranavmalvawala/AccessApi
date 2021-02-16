@@ -23,7 +23,7 @@ INSERT INTO permissions (apiName, section, action, displaySection, displayAction
 INSERT INTO apis (keyName, name) VALUES ('B1Api', 'B1');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('B1Api', 'Settings', 'Edit', 'Settings', 'Edit');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('B1Api', 'Links', 'Edit', 'Content', 'Edit Links');
-INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('StreamingLiveApi', 'Pages', 'Edit', 'Content', 'Edit Pages');
+INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('B1Api', 'Pages', 'Edit', 'Content', 'Edit Pages');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'Forms', 'Edit', 'Forms', 'Edit');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('MembershipApi', 'Forms', 'View', 'Forms', 'View');
 INSERT INTO permissions (apiName, section, action, displaySection, displayAction) VALUES ('StreamingLiveApi', 'Links', 'Edit', 'Content', 'Edit Links');
