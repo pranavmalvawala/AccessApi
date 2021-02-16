@@ -36,7 +36,7 @@
     "kind-of": "^6.0.3",
     "mysql": "^2.18.1",
     "reflect-metadata": "^0.1.13",
-    "uuid": "^8.3.0",
+    "uuid": "^8.3.2",
     "winston": "^3.3.3",
     "winston-cloudwatch": "^2.3.2"
   },
