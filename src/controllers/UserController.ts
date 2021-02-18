@@ -86,10 +86,11 @@ export class UserController extends AccessBaseController {
       else {
         user.authGuid = v4();
         const emailBody = req.body.body.replace(/{auth}/g, user.authGuid);
+        const fromEmail = req.body.fromEmail || process.env.SUPPORT_EMAIL;
 
         const promises = [];
         promises.push(this.repositories.user.save(user));
-        promises.push(EmailHelper.sendEmail(req.body.fromEmail, user.email, req.body.subject, emailBody));
+        promises.push(EmailHelper.sendEmail(fromEmail, user.email, req.body.subject, emailBody));
         await Promise.all(promises);
         return this.json({ emailed: true }, 200);
       }
