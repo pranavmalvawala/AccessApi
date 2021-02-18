@@ -13,3 +13,5 @@ DB_PASSWORD=
 
 JWT_SECRET_KEY=this is a test key that is a sentence
 JWT_EXPIRATION=2 days
+
+SUPPORT_EMAIL=support@churchapps.org
