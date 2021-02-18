@@ -14,7 +14,7 @@ export class EmailHelper {
                         Body: { Html: { Charset: "UTF-8", Data: body } },
                         Subject: { Charset: "UTF-8", Data: subject },
                     },
-                    Source: from || process.env.SUPPORT_EMAIL
+                    Source: from
                 };
                 const resp = await ses.sendEmail(params).promise();
                 resolve();
