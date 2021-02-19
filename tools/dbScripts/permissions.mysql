@@ -1,11 +1,12 @@
 DROP TABLE IF EXISTS `permissions`;
 
 CREATE TABLE `permissions` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` char(11) NOT NULL,
   `apiName` varchar(45) DEFAULT NULL,
   `section` VARCHAR(45) NULL,
   `action` VARCHAR(45) NULL,
   `displaySection` VARCHAR(45) NULL,
   `displayAction` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

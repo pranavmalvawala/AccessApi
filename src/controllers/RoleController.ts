@@ -19,7 +19,7 @@ export class RoleController extends AccessBaseController {
     }
 
     @httpGet("/:id")
-    public async loadById(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    public async loadById(@requestParam("id") id: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const role: Role = await this.repositories.role.loadById(au.churchId, id);
             const roles: Role[] = [role];
@@ -47,7 +47,7 @@ export class RoleController extends AccessBaseController {
     }
 
     @httpDelete("/:id")
-    public async delete(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    public async delete(@requestParam("id") id: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const role: Role = await this.repositories.role.loadById(au.churchId, id);
             const roles: Role[] = [role];

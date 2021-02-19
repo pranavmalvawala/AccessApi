@@ -1,17 +1,19 @@
 import { DB } from "../apiBase/db";
 import { User } from "../models";
+import { UniqueIdHelper } from "../helpers";
 
 export class UserRepository {
 
   public async save(user: User) {
-    if (user.id > 0) return this.update(user); else return this.create(user);
+    if (UniqueIdHelper.isMissing(user.id)) return this.create(user); else return this.update(user);
   }
 
   public async create(user: User) {
+    user.id = UniqueIdHelper.shortId();
     return DB.query(
-      "INSERT INTO users (email, password, authGuid, displayName) VALUES (?, ?, ?, ?);",
-      [user.email, user.password, user.authGuid, user.displayName]
-    ).then((row: any) => { user.id = row.insertId; return user; });
+      "INSERT INTO users (id, email, password, authGuid, displayName) VALUES (?, ?, ?, ?, ?);",
+      [user.id, user.email, user.password, user.authGuid, user.displayName]
+    ).then(() => { return user; });
   }
 
   public async update(user: User) {
@@ -22,7 +24,7 @@ export class UserRepository {
   }
 
 
-  public async load(id: number): Promise<User> {
+  public async load(id: string): Promise<User> {
     return DB.queryOne("SELECT * FROM users WHERE id=?", [id]);
   }
 
@@ -38,7 +40,7 @@ export class UserRepository {
     return DB.queryOne("SELECT * FROM users WHERE email=? AND password=?", [email, hashedPassword]);
   }
 
-  public async loadByIds(ids: number[]): Promise<User[]> {
+  public async loadByIds(ids: string[]): Promise<User[]> {
     return DB.query("SELECT * FROM users WHERE id IN (?)", [ids]);
   }
 }

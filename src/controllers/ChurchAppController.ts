@@ -17,7 +17,7 @@ export class ChurchAppController extends AccessBaseController {
     }
 
 
-    async validateRegister(churchId: number, appName: string) {
+    async validateRegister(churchId: string, appName: string) {
         const result: string[] = [];
         // Verify access - Need to add a role.
         if (true) {

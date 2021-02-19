@@ -1,15 +1,15 @@
 // import { DbHelper } from "../helpers/DbHelper.js";
 
 export class RolePermission {
-  public id?: number;
-  public churchId?: number;
-  public roleId?: number;
+  public id?: string;
+  public churchId?: string;
+  public roleId?: string;
   public apiName?: string;
   public contentType?: string;
-  public contentId?: number | null;
+  public contentId?: string | null;
   public action?: string;
 
-  constructor(churchId: number, roleId: number, apiName: string, contentType: string, contentId: number | null, action: string) {
+  constructor(churchId: string, roleId: string, apiName: string, contentType: string, contentId: string | null, action: string) {
     this.churchId = churchId;
     this.roleId = roleId;
     this.apiName = apiName;

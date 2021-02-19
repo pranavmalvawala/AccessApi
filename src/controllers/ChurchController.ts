@@ -46,7 +46,7 @@ export class ChurchController extends AccessBaseController {
         const church = this.repositories.church.convertToModel(data);
         result = { id: church.id };
       } else if (req.query.id !== undefined) {
-        const data = await this.repositories.church.loadById(parseInt(req.query.id.toString(), 0));
+        const data = await this.repositories.church.loadById(req.query.id.toString());
         const church = this.repositories.church.convertToModel(data);
         result = { subDomain: church.subDomain };
       }
@@ -58,9 +58,9 @@ export class ChurchController extends AccessBaseController {
   }
 
   @httpGet("/:id")
-  public async get(@requestParam("id") id: number, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+  public async get(@requestParam("id") id: string, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
-      const churchId = parseInt(id.toString(), 0); // I think it's a float coming in and the comparisons fail.
+      const churchId = id.toString();
       let hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
       if (!hasAccess) {
         const churches = await this.repositories.rolePermission.loadForUser(au.id, true);
@@ -76,7 +76,7 @@ export class ChurchController extends AccessBaseController {
         if (this.include(req, "permissions")) {
           let universalChurch = null;
           const churches = await this.repositories.rolePermission.loadForUser(au.id, false);
-          churches.forEach(c => { if (c.id === 0) universalChurch = c; });
+          churches.forEach(c => { if (c.id === "") universalChurch = c; });
           const result = await this.repositories.rolePermission.loadForChurch(id, universalChurch);
           if (result !== null) church.apis = result.apis;
         }
@@ -171,7 +171,11 @@ export class ChurchController extends AccessBaseController {
         user = await this.repositories.user.save(user);
 
         // Add first user to server admins group
-        if (churchCount === 0) this.repositories.roleMember.save({ churchId: church.id, roleId: 1, userId: user.id, addedBy: user.id });
+        if (churchCount === 0) {
+          this.repositories.role.loadAll().then(roles => {
+            this.repositories.roleMember.save({ churchId: church.id, roleId: roles[0].id, userId: user.id, addedBy: user.id });
+          })
+        }
 
         // Add AccessManagement App
         let churchApp: ChurchApp = { churchId: church.id, appName: "AccessManagement", registrationDate: new Date() };
