@@ -9,10 +9,11 @@ export class UserRepository {
   }
 
   public async create(user: User) {
+    user.id = UniqueIdHelper.shortId();
     return DB.query(
       "INSERT INTO users (id, email, password, authGuid, displayName) VALUES (?, ?, ?, ?, ?);",
-      [UniqueIdHelper.shortId(), user.email, user.password, user.authGuid, user.displayName]
-    ).then((row: any) => { user.id = row.insertId; return user; });
+      [user.id, user.email, user.password, user.authGuid, user.displayName]
+    ).then(() => { return user; });
   }
 
   public async update(user: User) {

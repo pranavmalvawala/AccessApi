@@ -9,10 +9,11 @@ export class RoleMemberRepository {
     }
 
     public async create(roleMember: RoleMember) {
+        roleMember.id = UniqueIdHelper.shortId();
         return DB.query(
             "INSERT INTO roleMembers (id, churchId, roleId, userId, dateAdded, addedBy) VALUES (?, ?, ?, ?, NOW(), ?);",
-            [UniqueIdHelper.shortId(), roleMember.churchId, roleMember.roleId, roleMember.userId, roleMember.addedBy]
-        ).then((row: any) => { roleMember.id = row.insertId; return roleMember; });
+            [roleMember.id, roleMember.churchId, roleMember.roleId, roleMember.userId, roleMember.addedBy]
+        ).then((row: any) => { return roleMember; });
     }
 
     public async update(roleMember: RoleMember) {

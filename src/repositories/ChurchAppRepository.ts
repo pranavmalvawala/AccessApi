@@ -21,9 +21,10 @@ export class ChurchAppRepository {
     }
 
     public async create(churchApp: ChurchApp) {
+        churchApp.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO churchApps (id, churchId, appName, registrationDate) VALUES (?, ?, ?, NOW());";
-        const params = [UniqueIdHelper.shortId(), churchApp.churchId, churchApp.appName];
-        return DB.query(sql, params).then((row: any) => { churchApp.id = row.insertId; return churchApp; });
+        const params = [churchApp.id, churchApp.churchId, churchApp.appName];
+        return DB.query(sql, params).then((row: any) => { return churchApp; });
     }
 
     public async update(churchApp: ChurchApp) {

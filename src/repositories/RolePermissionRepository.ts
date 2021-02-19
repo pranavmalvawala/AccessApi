@@ -9,10 +9,11 @@ export class RolePermissionRepository {
     }
 
     public async create(rolePermission: RolePermission) {
+        rolePermission.id = UniqueIdHelper.shortId();
         return DB.query(
             "INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, contentId, action) VALUES (?, ?, ?, ?, ?, ?, ?);",
-            [UniqueIdHelper.shortId(), rolePermission.churchId, rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action]
-        ).then((row: any) => { rolePermission.id = row.insertId; return rolePermission; });
+            [rolePermission.id, rolePermission.churchId, rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action]
+        ).then((row: any) => { return rolePermission; });
     }
 
     public async update(rolePermission: RolePermission) {

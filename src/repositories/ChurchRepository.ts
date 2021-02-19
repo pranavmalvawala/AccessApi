@@ -37,9 +37,10 @@ export class ChurchRepository {
   }
 
   public async create(church: Church) {
+    church.id = UniqueIdHelper.shortId();
     const sql = "INSERT INTO churches (id, name, subDomain, registrationDate, address1, address2, city, state, zip, country) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?);";
-    const params = [UniqueIdHelper.shortId(), church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country]
-    return DB.query(sql, params).then((row: any) => { church.id = row.insertId; return church; });
+    const params = [church.id, church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country]
+    return DB.query(sql, params).then(() => { return church; });
   }
 
   public async update(church: Church) {
