@@ -1,7 +1,9 @@
 DROP TABLE IF EXISTS `applicationApis`;
 
 CREATE TABLE `applicationApis` (
-  `id` INT NOT NULL AUTO_INCREMENT,
+  `id` char(11) NOT NULL,
   `applicationName` VARCHAR(45) NULL,
   `apiName` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`));
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -1,5 +1,5 @@
 export class Permission {
-    public id?: number;
+    public id?: string;
     public apiName: string;
     public section?: string;
     public action?: string;

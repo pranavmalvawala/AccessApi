@@ -1,12 +1,13 @@
 DROP TABLE IF EXISTS `rolePermissions`;
 
 CREATE TABLE `rolePermissions` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `churchId` int(11) DEFAULT NULL,
-  `roleId` int(11) DEFAULT NULL,
+  `id` char(11) NOT NULL,
+  `churchId` char(11) DEFAULT NULL,
+  `roleId` char(11) DEFAULT NULL,
   `apiName` varchar(45) DEFAULT NULL,
   `contentType` varchar(45) DEFAULT NULL,
-  `contentId` int(11) DEFAULT NULL,
+  `contentId` char(11) DEFAULT NULL,
   `action` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

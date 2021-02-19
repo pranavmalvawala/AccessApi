@@ -9,7 +9,7 @@ import { Permissions, IPermission } from '../helpers'
 export class RolePermissionController extends AccessBaseController {
 
     @httpGet("/roles/:id")
-    public async loadByRole(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    public async loadByRole(@requestParam("id") id: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const permissions = await this.repositories.rolePermission.loadByRoleId(au.churchId, id);
             const hasAccess = await this.checkAccess(permissions, Permissions.rolePermissions.view, au);
@@ -21,7 +21,7 @@ export class RolePermissionController extends AccessBaseController {
     }
 
     @httpDelete("/:id")
-    public async deletePermission(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    public async deletePermission(@requestParam("id") id: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             if (!au.checkAccess(Permissions.rolePermissions.edit)) return this.json({}, 401);
             else {
@@ -54,7 +54,7 @@ export class RolePermissionController extends AccessBaseController {
         const hasAccess = au.checkAccess(permission);
         /*
         if (hasAccess) {
-            const roleIds: number[] = [];
+            const roleIds: string[] = [];
             permissions.forEach(p => { if (roleIds.indexOf(p.roleId) === -1) roleIds.push(p.roleId); })
             if (roleIds.length > 0) {
                 const roles = await this.repositories.role.loadByIds(roleIds);

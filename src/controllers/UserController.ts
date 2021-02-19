@@ -44,9 +44,9 @@ export class UserController extends AccessBaseController {
     }
   }
 
-  private async grantAdminAccess(churches: Church[], churchId: number) {
+  private async grantAdminAccess(churches: Church[], churchId: string) {
     let universalChurch = null;
-    churches.forEach(c => { if (c.id === 0) universalChurch = c; });
+    churches.forEach(c => { if (c.id === "") universalChurch = c; });
 
     if (universalChurch !== null) {
       let selectedChurch = null;

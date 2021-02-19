@@ -1,5 +1,6 @@
 import { DB } from "../apiBase/db";
 import { Application } from "../models";
+import { UniqueIdHelper } from "../helpers";
 
 export class ApplicationRepository {
     public async loadAll() {

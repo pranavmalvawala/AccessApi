@@ -1,6 +1,6 @@
 import { Api } from '.'
 export class Church {
-  public id?: number;
+  public id?: string;
   public name: string;
   public subDomain?: string;
   public address1?: string;

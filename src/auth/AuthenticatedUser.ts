@@ -8,7 +8,7 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
 
     public static async login(allChurches: Church[], user: User) {
         const churches = [...allChurches];
-        if (churches.length > 1 && churches[0].id === 0) churches.splice(0, 1); // remove empty church with universal permissions if there are actual church records.
+        if (churches.length > 1 && churches[0].id === "") churches.splice(0, 1); // remove empty church with universal permissions if there are actual church records.
 
         if (churches.length === 0) return null;
         else {
@@ -37,7 +37,7 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
         let result: User = null;
         try {
             const decoded = new Principal(jwt.verify(token, process.env.JWT_SECRET_KEY));
-            const userId: number = decoded.details.id;
+            const userId: string = decoded.details.id;
             result = await repositories.user.load(userId);
         } catch { console.log('No match'); };
         return result;

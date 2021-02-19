@@ -1,16 +1,17 @@
 import { DB } from "../apiBase/db";
 import { RolePermission, Church, Api } from "../models";
+import { UniqueIdHelper } from "../helpers";
 
 export class RolePermissionRepository {
 
     public async save(rolePermission: RolePermission) {
-        if (rolePermission.id > 0) return this.update(rolePermission); else return this.create(rolePermission);
+        if (UniqueIdHelper.isMissing(rolePermission.id)) return this.create(rolePermission); else return this.update(rolePermission);
     }
 
     public async create(rolePermission: RolePermission) {
         return DB.query(
-            "INSERT INTO rolePermissions (churchId, roleId, apiName, contentType, contentId, action) VALUES (?, ?, ?, ?, ?, ?);",
-            [rolePermission.churchId, rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action]
+            "INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, contentId, action) VALUES (?, ?, ?, ?, ?, ?, ?);",
+            [UniqueIdHelper.shortId(), rolePermission.churchId, rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action]
         ).then((row: any) => { rolePermission.id = row.insertId; return rolePermission; });
     }
 
@@ -21,20 +22,20 @@ export class RolePermissionRepository {
         ).then(() => { return rolePermission });
     }
 
-    public async deleteForRole(churchId: number, roleId: number) {
+    public async deleteForRole(churchId: string, roleId: string) {
         const sql = "DELETE FROM rolePermissions WHERE churchId=? AND roleId=?"
         const params = [churchId, roleId];
         return DB.query(sql, params);
     }
 
-    public async delete(churchId: number, id: number) {
+    public async delete(churchId: string, id: string) {
         const sql = "DELETE FROM rolePermissions WHERE churchId=? AND id=?"
         const params = [churchId, id];
         return DB.query(sql, params);
     }
 
 
-    public async loadForUser(userId: number, removeUniversal: boolean): Promise<Church[]> {
+    public async loadForUser(userId: string, removeUniversal: boolean): Promise<Church[]> {
 
         const query = "SELECT c.name AS churchName, r.churchId, c.subDomain, rp.apiName, rp.contentType, rp.contentId, rp.action"
             + " FROM roleMembers rm"
@@ -67,7 +68,7 @@ export class RolePermissionRepository {
         return result;
     }
 
-    public async loadForChurch(churchId: number, univeralChurch: Church): Promise<Church> {
+    public async loadForChurch(churchId: string, univeralChurch: Church): Promise<Church> {
         const query = "SELECT c.name AS churchName, r.churchId, c.subDomain, rp.apiName, rp.contentType, rp.contentId, rp.action"
             + " FROM roles r"
             + " INNER JOIN rolePermissions rp on rp.roleId=r.id"
@@ -100,7 +101,7 @@ export class RolePermissionRepository {
 
     // Apply site admin priviledges that aren't tied to a specific church.
     private applyUniversal(churches: Church[]) {
-        if (churches.length < 2 || churches[0].id > 0) return false;
+        if (churches.length < 2 || churches[0].id !== "") return false;
         for (let i = 1; i < churches.length; i++) {
             churches[i].apis.forEach(api => {
                 churches[0].apis.forEach(universalApi => {
@@ -111,7 +112,7 @@ export class RolePermissionRepository {
         return true;
     }
 
-    public async loadByRoleId(churchId: number, roleId: number): Promise<RolePermission[]> {
+    public async loadByRoleId(churchId: string, roleId: string): Promise<RolePermission[]> {
         return DB.query("SELECT * FROM rolePermissions WHERE churchId=? AND roleId=?", [churchId, roleId]);
     }
 

@@ -10,14 +10,14 @@ export class RoleMemberController extends AccessBaseController {
 
 
     @httpGet("/roles/:id")
-    public async loadByRole(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    public async loadByRole(@requestParam("id") id: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const members = await this.repositories.roleMember.loadByRoleId(id, au.churchId);
             const hasAccess = await this.checkAccess(members, Permissions.roleMembers.view, au);
             if (!hasAccess) return this.json({}, 401);
             else {
                 if (this.include(req, "users")) {
-                    const userIds: number[] = [];
+                    const userIds: string[] = [];
                     members.forEach(m => { if (userIds.indexOf(m.userId) === -1) userIds.push(m.userId); });
                     if (userIds.length > 0) {
                         const users = await this.repositories.user.loadByIds(userIds);
@@ -47,7 +47,7 @@ export class RoleMemberController extends AccessBaseController {
                 for (const member of members) {
                     member.churchId = au.churchId;
                     if (member.addedBy === undefined || member.addedBy === null) member.addedBy = au.id;
-                    if (member.userId === undefined || member.userId === null || member.userId === 0) member.userId = await this.getUserId(member.user);
+                    if (member.userId === undefined || member.userId === null || member.userId === "") member.userId = await this.getUserId(member.user);
                     promises.push(this.repositories.roleMember.save(member));
                 }
                 members = await Promise.all(promises);
@@ -71,7 +71,7 @@ export class RoleMemberController extends AccessBaseController {
 
 
     @httpDelete("/:id")
-    public async delete(@requestParam("id") id: number, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+    public async delete(@requestParam("id") id: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
             const member = await this.repositories.roleMember.loadById(id, au.churchId);
             const hasAccess = await this.checkAccess([member], Permissions.roleMembers.view, au);
@@ -87,7 +87,7 @@ export class RoleMemberController extends AccessBaseController {
         const hasAccess = au.checkAccess(permission);
         /*
         if (hasAccess && au.apiName !== "AccessManagement") {
-            const roleIds: number[] = [];
+            const roleIds: string[] = [];
             members.forEach(m => { if (roleIds.indexOf(m.roleId) === -1) roleIds.push(m.roleId); })
             if (roleIds.length > 0) {
                 const roles = await this.repositories.role.loadByIds(roleIds);

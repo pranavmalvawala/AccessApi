@@ -1,5 +1,6 @@
 import { DB } from "../apiBase/db";
 import { Church } from "../models";
+import { UniqueIdHelper } from "../helpers";
 
 export class ChurchRepository {
 
@@ -27,17 +28,17 @@ export class ChurchRepository {
     return DB.queryOne("SELECT * FROM churches WHERE subDomain=?;", [subDomain]);
   }
 
-  public async loadById(id: number) {
+  public async loadById(id: string) {
     return DB.queryOne("SELECT * FROM churches WHERE id=?;", [id]);
   }
 
   public async save(church: Church) {
-    if (church.id > 0) return this.update(church); else return this.create(church);
+    if (UniqueIdHelper.isMissing(church.id)) return this.create(church); else return this.update(church);
   }
 
   public async create(church: Church) {
-    const sql = "INSERT INTO churches (name, subDomain, registrationDate, address1, address2, city, state, zip, country) VALUES (?, ?, NOW(), ?, ?, ?, ?, ?, ?);";
-    const params = [church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country]
+    const sql = "INSERT INTO churches (id, name, subDomain, registrationDate, address1, address2, city, state, zip, country) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?);";
+    const params = [UniqueIdHelper.shortId(), church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country]
     return DB.query(sql, params).then((row: any) => { church.id = row.insertId; return church; });
   }
 
