@@ -4,6 +4,6 @@ CREATE TABLE `apis` (
   `id` char(11) NOT NULL,
   `keyName` VARCHAR(45) NULL,
   `name` VARCHAR(255) NULL,
-  PRIMARY KEY (`id`)),
+  PRIMARY KEY (`id`),
   UNIQUE KEY `id_UNIQUE` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
