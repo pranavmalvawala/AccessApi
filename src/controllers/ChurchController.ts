@@ -144,10 +144,6 @@ export class ChurchController extends AccessBaseController {
       if (church !== null) result.push("Subdomain unavailable");
     }
 
-    // Verify user doesn't exist
-    const user = await this.repositories.user.loadByEmail(email);
-    if (user !== null) result.push("User already registered");
-
     return result;
   }
 
@@ -167,8 +163,13 @@ export class ChurchController extends AccessBaseController {
         // create or get the user
         const hashedPass = bcrypt.hashSync(req.body.password, 10);
         const userUUID = uuidv4();
-        let user: User = { email: req.body.email, displayName: req.body.displayName, password: hashedPass, authGuid: userUUID };
-        user = await this.repositories.user.save(user);
+
+        // create user if doesn't exist
+        let user = await this.repositories.user.loadByEmail(req.body.email);
+        if (user === null) {
+          const newUser: User = { email: req.body.email, displayName: req.body.displayName, password: hashedPass, authGuid: userUUID };
+          user = await this.repositories.user.save(newUser);
+        }
 
         // Add first user to server admins group
         if (churchCount === 0) {
