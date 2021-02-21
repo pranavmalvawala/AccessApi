@@ -1,7 +1,7 @@
 import { controller, httpPost } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
-import { LoginRequest, SwitchAppRequest, User, ResetPasswordRequest, LoadCreateUserRequest, Church } from "../models";
+import { LoginRequest, SwitchAppRequest, User, ResetPasswordRequest, LoadCreateUserRequest, Church, EmailPassword } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper } from "../helpers";
@@ -41,6 +41,28 @@ export class UserController extends AccessBaseController {
     } catch (e) {
       this.logger.error(e);
       return this.error([e.toString()]);
+    }
+  }
+
+  @httpPost("/verifyCredentials")
+  public async verifyCredentials(req: express.Request<{}, {}, EmailPassword>, res: express.Response): Promise<any> {
+    try {
+      const user = await this.repositories.user.loadByEmail(req.body.email);
+      if (user === null) {
+        return this.json({}, 200);
+      }
+
+      const passwordMatched = bcrypt.compareSync(req.body.password, user.password);
+      if (!passwordMatched) {
+        return this.denyAccess(["Incorrect password"]);
+      }
+      const churches = await this.repositories.rolePermission.loadForUser(user.id, false)
+      const churchNames = churches.map(c => c.name);
+
+      return this.json({ churches: churchNames }, 200);
+    } catch (e) {
+      this.logger.error(e);
+      return this.error([e.toString()])
     }
   }
 

@@ -5,3 +5,8 @@ export type LoginRequest = {
     password: string;
     appName: string;
 };
+
+export type EmailPassword = {
+    email: string;
+    password: string;
+}
