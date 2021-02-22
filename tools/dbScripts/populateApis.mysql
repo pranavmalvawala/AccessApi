@@ -45,6 +45,8 @@ INSERT INTO apis (id, keyName, name) VALUES ('g1', 'GivingApi', 'Giving');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g2', 'GivingApi', 'Donations', 'Edit', 'Donations', 'Edit');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g3', 'GivingApi', 'Donations', 'View', 'Donations', 'View');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g4', 'GivingApi', 'Donations', 'View Summary', 'Donations', 'View Summary');
+INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g5', 'GivingApi', 'Settings', 'Edit', 'Settings', 'Edit');
+INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g6', 'GivingApi', 'Settings', 'View', 'Settings', 'View');
 
 INSERT INTO apis (id, keyName, name) VALUES ('at1', 'AttendanceApi', 'Attendance');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at2', 'AttendanceApi', 'Services', 'Edit', 'Admin', 'Edit Services');
