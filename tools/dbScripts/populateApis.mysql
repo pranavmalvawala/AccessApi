@@ -24,10 +24,6 @@ INSERT INTO apis (id, keyName, name) VALUES ('b1', 'B1Api', 'B1');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b2', 'B1Api', 'Settings', 'Edit', 'Settings', 'Edit');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b3', 'B1Api', 'Links', 'Edit', 'Content', 'Edit Links');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b4', 'B1Api', 'Pages', 'Edit', 'Content', 'Edit Pages');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b5', 'MembershipApi', 'Forms', 'Edit', 'Forms', 'Edit');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b6', 'MembershipApi', 'Forms', 'View', 'Forms', 'View');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b7', 'StreamingLiveApi', 'Links', 'Edit', 'Content', 'Edit Links');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b8', 'StreamingLiveApi', 'Pages', 'Edit', 'Content', 'Edit Pages');
 
 INSERT INTO apis (id, keyName, name) VALUES ('m1', 'MembershipApi', 'Membership');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m2', 'MembershipApi', 'Forms', 'Edit', 'Forms', 'Edit');
@@ -45,12 +41,12 @@ INSERT INTO apis (id, keyName, name) VALUES ('g1', 'GivingApi', 'Giving');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g2', 'GivingApi', 'Donations', 'Edit', 'Donations', 'Edit');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g3', 'GivingApi', 'Donations', 'View', 'Donations', 'View');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g4', 'GivingApi', 'Donations', 'View Summary', 'Donations', 'View Summary');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g5', 'GivingApi', 'Settings', 'Edit', 'Settings', 'Edit');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g6', 'GivingApi', 'Settings', 'View', 'Settings', 'View');
+INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g5', 'GivingApi', 'Settings', 'Edit', 'Donations', 'Edit Settings');
+INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g6', 'GivingApi', 'Settings', 'View', 'Donations', 'View Settings');
 
 INSERT INTO apis (id, keyName, name) VALUES ('at1', 'AttendanceApi', 'Attendance');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at2', 'AttendanceApi', 'Services', 'Edit', 'Admin', 'Edit Services');
+INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at2', 'AttendanceApi', 'Services', 'Edit', 'Attendance', 'Edit Services');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at3', 'AttendanceApi', 'Attendance', 'Edit', 'Attendance', 'Edit');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at4', 'AttendanceApi', 'Attendance', 'View', 'Attendance', 'View');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at5', 'AttendanceApi', 'Attendance', 'View Summary', 'Attendance', 'View Summary');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at6', 'AttendanceApi', 'Settings', 'Edit', 'Admin', 'Edit Settings');
+INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at6', 'AttendanceApi', 'Settings', 'Edit', 'Attendance', 'Edit Settings');
