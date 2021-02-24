@@ -102,7 +102,7 @@ export class RolePermissionRepository {
 
     // Apply site admin priviledges that aren't tied to a specific church.
     private applyUniversal(churches: Church[]) {
-        if (churches.length < 2 || churches[0].id !== "") return false;
+        if (churches.length < 2 || churches[0].id !== "0") return false;
         for (let i = 1; i < churches.length; i++) {
             churches[i].apis.forEach(api => {
                 churches[0].apis.forEach(universalApi => {

@@ -33,7 +33,7 @@ export class UserController extends AccessBaseController {
 
       if (user === null) return this.denyAccess(["Login failed"]);
       else {
-        const churches = await this.repositories.rolePermission.loadForUser(user.id, false)
+        const churches = await this.repositories.rolePermission.loadForUser(user.id, true)  // Set to true so churches[0] is always a real church.  Not sre why it was false before.  If we need to change this make it a param on the login request
         const result = await AuthenticatedUser.login(churches, user);
         if (result === null) return this.denyAccess(["No permissions"]);
         else return this.json(result, 200);
