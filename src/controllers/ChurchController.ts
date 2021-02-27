@@ -15,7 +15,9 @@ export class ChurchController extends AccessBaseController {
   public async loadAll(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
-      const data = await this.repositories.church.loadAll();
+      let term: string = req.query.term.toString();
+      if (term === null) term = "";
+      const data = await this.repositories.church.search(term, "");
       const churches = this.repositories.church.convertAllToModel(data);
       return churches;
     });
