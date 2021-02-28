@@ -88,6 +88,28 @@ export class ChurchController extends AccessBaseController {
     });
   }
 
+  @httpGet("/:id/impersonate")
+  public async impersonate(@requestParam("id") id: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      const churchId = id.toString();
+      const hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
+
+      if(!hasAccess) return this.json({}, 401);
+      else {
+        const user = await this.repositories.user.load(au.id);
+
+        let universalChurch = null;
+        const churches = await this.repositories.rolePermission.loadForUser(au.id, false);
+        churches.forEach(c => { if (c.id === "0") universalChurch = c; });
+        const result = await this.repositories.rolePermission.loadForChurch(churchId, universalChurch);
+
+        const churchWithAuth = await AuthenticatedUser.login([result], user);
+
+        return churchWithAuth;
+      }
+    })
+  }
+
 
   @httpGet("/")
   public async loadForUser(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
