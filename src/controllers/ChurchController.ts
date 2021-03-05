@@ -15,7 +15,9 @@ export class ChurchController extends AccessBaseController {
   public async loadAll(req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
-      const data = await this.repositories.church.loadAll();
+      let term: string = req.query.term.toString();
+      if (term === null) term = "";
+      const data = await this.repositories.church.search(term, "");
       const churches = this.repositories.church.convertAllToModel(data);
       return churches;
     });
@@ -84,6 +86,28 @@ export class ChurchController extends AccessBaseController {
         return church;
       }
     });
+  }
+
+  @httpGet("/:id/impersonate")
+  public async impersonate(@requestParam("id") id: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      const churchId = id.toString();
+      const hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
+
+      if(!hasAccess) return this.json({}, 401);
+      else {
+        const user = await this.repositories.user.load(au.id);
+
+        let universalChurch = null;
+        const churches = await this.repositories.rolePermission.loadForUser(au.id, false);
+        churches.forEach(c => { if (c.id === "0") universalChurch = c; });
+        const result = await this.repositories.rolePermission.loadForChurch(churchId, universalChurch);
+
+        const churchWithAuth = await AuthenticatedUser.login([result], user);
+
+        return churchWithAuth;
+      }
+    })
   }
 
 
