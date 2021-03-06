@@ -8,8 +8,8 @@ export class ConfigHelper {
 
     static generateJson = (settings: ISettingsConfig) => {
         const result: any = {};
-        result.colors = { primary: settings.primaryColor, contrast: settings.contrastColor };
-        result.logo = { url: settings.homePageUrl, image: settings.logoUrl };
+        result.colors = { primary: settings?.primaryColor, contrast: settings?.contrastColor };
+        result.logo = { url: settings?.homePageUrl, image: settings?.logoUrl };
         return result;
     }
 }
