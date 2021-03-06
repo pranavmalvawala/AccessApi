@@ -22,6 +22,7 @@ const init = async () => {
     { title: "Populate Data", file: "populateData.mysql" },
   ];
 
+  await DBCreator.init(["Settings"])
   await initTables("Access", tables);
 }
 
