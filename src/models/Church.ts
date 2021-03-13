@@ -10,5 +10,6 @@ export class Church {
   public zip?: string;
   public country?: string;
   public registrationDate?: Date;
-  public apis?: Api[]
+  public apis?: Api[];
+  public jwt?: string;
 }
