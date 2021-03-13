@@ -27,7 +27,7 @@ export class UserController extends AccessBaseController {
       } else {
         user = await this.repositories.user.loadByEmail(req.body.email);
         if (user !== null) {
-          if (!bcrypt.compareSync(req.body.password, user.password)) user = null;
+          if (!bcrypt.compareSync(req.body.password, user.password?.toString() || "")) user = null;
         }
       }
 
