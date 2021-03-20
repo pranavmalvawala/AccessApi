@@ -91,7 +91,7 @@ export class UserController extends AccessBaseController {
         user.authGuid = v4();
         user = await this.repositories.user.save(user);
         const emailBody = req.body.body.replace(/{auth}/g, user.authGuid);
-        await EmailHelper.sendEmail(req.body.fromEmail, user.email, req.body.subject, emailBody);
+        await EmailHelper.sendEmail({ from: req.body.fromEmail, to: user.email, subject: req.body.subject, body: emailBody});
       }
       user.password = null;
       return this.json(user, 200);
@@ -112,7 +112,7 @@ export class UserController extends AccessBaseController {
 
         const promises = [];
         promises.push(this.repositories.user.save(user));
-        promises.push(EmailHelper.sendEmail(fromEmail, user.email, req.body.subject, emailBody));
+        promises.push(EmailHelper.sendEmail({ from: fromEmail, to: user.email, subject: req.body.subject, body: emailBody }));
         await Promise.all(promises);
         return this.json({ emailed: true }, 200);
       }
