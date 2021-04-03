@@ -174,6 +174,7 @@ export class ChurchController extends AccessBaseController {
   @httpPost("/register")
   public async register(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<any> {
     try {
+      req.body.subDomain = req.body.subDomain.toLowerCase();
       const errors = await this.validateRegister(req.body.subDomain, req.body.email);
       if (errors.length > 0) return this.json({ errors }, 401);
       else {
