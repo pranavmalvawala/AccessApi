@@ -90,8 +90,10 @@ export class UserController extends AccessBaseController {
         user.lastLogin = user.registrationDate;
         user.authGuid = v4();
         user = await this.repositories.user.save(user);
-        const emailBody = req.body.body.replace(/{auth}/g, user.authGuid);
-        await EmailHelper.sendEmail({ from: req.body.fromEmail, to: user.email, subject: req.body.subject, body: emailBody});
+        if (req.body.body) {
+          const emailBody = req.body.body.replace(/{auth}/g, user.authGuid);
+          await EmailHelper.sendEmail({ from: req.body.fromEmail || process.env.SUPPORT_EMAIL, to: user.email, subject: req.body.subject, body: emailBody});
+        }
       }
       user.password = null;
       return this.json(user, 200);
