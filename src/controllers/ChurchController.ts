@@ -7,6 +7,7 @@ import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
 import { Utils, Permissions } from "../helpers";
 import { Repositories } from "../repositories";
+import { ArrayHelper } from "../apiBase";
 
 @controller("/churches")
 export class ChurchController extends AccessBaseController {
@@ -31,6 +32,7 @@ export class ChurchController extends AccessBaseController {
         const app = (req.query.app === undefined) ? "" : req.query.app.toString();
         const data = await this.repositories.church.search(req.query.name.toString(), app);
         result = this.repositories.church.convertAllToModel(data);
+        if (result.length > 0 && this.include(req, "logoSquare")) await this.appendLogos(result);
       }
       return this.json(result, 200);
     } catch (e) {
@@ -94,7 +96,7 @@ export class ChurchController extends AccessBaseController {
       const churchId = id.toString();
       const hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
 
-      if(!hasAccess) return this.json({}, 401);
+      if (!hasAccess) return this.json({}, 401);
       else {
         const user = await this.repositories.user.load(au.id);
 
@@ -240,4 +242,15 @@ export class ChurchController extends AccessBaseController {
       return this.internalServerError(e);
     }
   }
+
+  private async appendLogos(churches: Church[]) {
+    const ids = ArrayHelper.getIds(churches, "id");
+    const settings = await this.baseRepositories.setting.loadMulipleChurches(["logoSquare"], ids);
+    settings.forEach((s: any) => {
+      const church = ArrayHelper.getOne(churches, "id", s.churchId);
+      if (church.settings === undefined) church.settings = [];
+      church.settings.push(s);
+    });
+  }
+
 }
