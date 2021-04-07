@@ -43,4 +43,9 @@ export class UserRepository {
   public async loadByIds(ids: string[]): Promise<User[]> {
     return DB.query("SELECT * FROM users WHERE id IN (?)", [ids]);
   }
+
+  public convertToModal(data: any) {
+    const user: User = { id: data.id, email: data.email, displayName: data.displayName };
+    return user;
+  }
 }
