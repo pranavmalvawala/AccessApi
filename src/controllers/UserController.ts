@@ -1,10 +1,10 @@
-import { controller, httpPost } from "inversify-express-utils";
+import { controller, httpGet, httpPost, interfaces, requestParam } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
 import { LoginRequest, SwitchAppRequest, User, ResetPasswordRequest, LoadCreateUserRequest, Church, EmailPassword } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
-import { EmailHelper } from "../helpers";
+import { EmailHelper, Permissions } from "../helpers";
 import { v4 } from 'uuid';
 
 @controller("/users")
@@ -169,5 +169,28 @@ export class UserController extends AccessBaseController {
     });
   }
 
+  @httpGet("/:id")
+  public async getUser(@requestParam("id") id: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      if (!au.checkAccess(Permissions.settings.edit)) return this.json({}, 401);
+      else {
+        const user = await this.repositories.user.load(id);
+        user.password = null;
+        return this.json(user, 200);
+      }
+    })
+  }
+
+  @httpPost("/updateUser")
+  public async updateUser(req: express.Request<{}, {}, User>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      if (!au.checkAccess(Permissions.settings.edit)) return this.json({}, 401);
+      else {
+        const user = await this.repositories.user.save(req.body);
+        user.password = null;
+        return this.json(user, 200);
+      }
+    })
+  }
 
 }
