@@ -1,6 +1,6 @@
 import { DB } from "../apiBase/db";
 import { User } from "../models";
-import { UniqueIdHelper } from "../helpers";
+import { UniqueIdHelper, DateTimeHelper } from "../helpers";
 
 export class UserRepository {
 
@@ -17,9 +17,11 @@ export class UserRepository {
   }
 
   public async update(user: User) {
+    const registrationDate = DateTimeHelper.toMysqlDate(user.registrationDate);
+    const lastLogin = DateTimeHelper.toMysqlDate(user.lastLogin);
     return DB.query(
       "UPDATE users SET email=?, password=?, authGuid=?, displayName=?, registrationDate=?, lastLogin=? WHERE id=?;",
-      [user.email, user.password, user.authGuid, user.displayName, user.registrationDate, user.lastLogin, user.id]
+      [user.email, user.password, user.authGuid, user.displayName, registrationDate, lastLogin, user.id]
     ).then(() => { return user });
   }
 
@@ -44,8 +46,4 @@ export class UserRepository {
     return DB.query("SELECT * FROM users WHERE id IN (?)", [ids]);
   }
 
-  public convertToModal(data: any) {
-    const user: User = { id: data.id, email: data.email, displayName: data.displayName };
-    return user;
-  }
 }

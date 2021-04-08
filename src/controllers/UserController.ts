@@ -175,10 +175,22 @@ export class UserController extends AccessBaseController {
       if (!au.checkAccess(Permissions.settings.edit)) return this.json({}, 401);
       else {
         const user = await this.repositories.user.load(id);
-        return this.repositories.user.convertToModal(user);
+        user.password = null;
+        return this.json(user, 200);
       }
     })
   }
 
+  @httpPost("/updateUser")
+  public async updateUser(req: express.Request<{}, {}, User>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      if (!au.checkAccess(Permissions.settings.edit)) return this.json({}, 401);
+      else {
+        const user = await this.repositories.user.save(req.body);
+        user.password = null;
+        return this.json(user, 200);
+      }
+    })
+  }
 
 }
