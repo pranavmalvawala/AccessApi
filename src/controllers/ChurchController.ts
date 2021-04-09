@@ -176,7 +176,7 @@ export class ChurchController extends AccessBaseController {
   @httpPost("/register")
   public async register(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<any> {
     try {
-      req.body.subDomain = req.body.subDomain.toLowerCase();
+
       const errors = await this.validateRegister(req.body.subDomain, req.body.email);
       if (errors.length > 0) return this.json({ errors }, 401);
       else {
@@ -228,6 +228,8 @@ export class ChurchController extends AccessBaseController {
         permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RolePermissions", null, "View"));
         permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RolePermissions", null, "Edit"));
         permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Settings", null, "Edit"));
+        permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "People", null, "Edit"));
+        permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "Households", null, "Edit"));
 
         const promises: Promise<any>[] = [];
         permissions.forEach((permission) => promises.push(this.repositories.rolePermission.save(permission)));
