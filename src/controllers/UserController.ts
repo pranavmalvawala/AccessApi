@@ -6,6 +6,7 @@ import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, Permissions } from "../helpers";
 import { v4 } from 'uuid';
+import passwordGenerator from 'generate-password';
 
 @controller("/users")
 export class UserController extends AccessBaseController {
@@ -85,11 +86,17 @@ export class UserController extends AccessBaseController {
     return this.actionWrapper(req, res, async (au) => {
       let user = await this.repositories.user.loadByEmail(req.body.userEmail);
       if (user === null) {
+        const randomGeneratedPassword = passwordGenerator.generate({ length: 10, numbers: true, lowercase: true, uppercase:true });
+        const subject = "Live Church Solutions Account Password"
+        const body = `Your generated Password is <b>${randomGeneratedPassword}</b>. You can furthermore change your password from Profile page.`
+
         user = { email: req.body.userEmail, displayName: req.body.userName }
         user.registrationDate = new Date();
         user.lastLogin = user.registrationDate;
         user.authGuid = v4();
+        user.password = bcrypt.hashSync(randomGeneratedPassword , 10);
         user = await this.repositories.user.save(user);
+        await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body  })
         if (req.body.body) {
           const emailBody = req.body.body.replace(/{auth}/g, user.authGuid);
           await EmailHelper.sendEmail({ from: req.body.fromEmail || process.env.SUPPORT_EMAIL, to: user.email, subject: req.body.subject, body: emailBody});
