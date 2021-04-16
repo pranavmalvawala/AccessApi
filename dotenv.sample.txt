@@ -18,3 +18,6 @@ SUPPORT_EMAIL=support@churchapps.org
 
 # Supports SES/SMTP. In case of no or incorrect value, SMTP will be used by default
 MAIL_SYSTEM=SMTP
+
+# Frontend
+FRONTEND_HOST=https://accounts.staging.churchapps.org
