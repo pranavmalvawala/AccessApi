@@ -20,4 +20,4 @@ SUPPORT_EMAIL=support@churchapps.org
 MAIL_SYSTEM=SMTP
 
 # Frontend
-FRONTEND_HOST=https://accounts.staging.churchapps.org
+FRONTEND_ACCOUNTS_APP_HOST=https://accounts.staging.churchapps.org

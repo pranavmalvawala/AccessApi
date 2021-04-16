@@ -196,7 +196,7 @@ export class UserController extends AccessBaseController {
   }
 
   private createLoginLink(id: string) {
-    return process.env.FRONTEND_HOST + `/login?auth=${id}`;
+    return process.env.FRONTEND_ACCOUNTS_APP_HOST + `/login?auth=${id}`;
   }
 
 }
