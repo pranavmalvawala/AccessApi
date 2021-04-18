@@ -91,10 +91,10 @@ export class UserController extends AccessBaseController {
         user.authGuid = v4();
         user = await this.repositories.user.save(user);
 
-        if (req.body.body) {
-          const emailBody = req.body.body.replace(/{auth}/g, user.authGuid);
-          await EmailHelper.sendEmail({ from: req.body.fromEmail || process.env.SUPPORT_EMAIL, to: user.email, subject: req.body.subject, body: emailBody});
-        }
+        const loginLink = this.createLoginLink(user.authGuid);
+        const subject = "Live Church Solutions One Time Login Link";
+        const body = `Your one time login link: <a href="${loginLink}">${loginLink}</a>`;
+        await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body});
       }
       user.password = null;
       return this.json(user, 200);
@@ -110,12 +110,13 @@ export class UserController extends AccessBaseController {
       if (user === null) return this.json({ emailed: false }, 200);
       else {
         user.authGuid = v4();
-        const emailBody = req.body.body.replace(/{auth}/g, user.authGuid);
-        const fromEmail = req.body.fromEmail || process.env.SUPPORT_EMAIL;
+        const loginLink = this.createLoginLink(user.authGuid);
+        const subject = "Live Church Solutions Password Reset"
+        const body = `Please click here to reset your password: <a href="${loginLink}">${loginLink}</a>"`;
 
         const promises = [];
         promises.push(this.repositories.user.save(user));
-        promises.push(EmailHelper.sendEmail({ from: fromEmail, to: user.email, subject: req.body.subject, body: emailBody }));
+        promises.push(EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body }));
         await Promise.all(promises);
         return this.json({ emailed: true }, 200);
       }
@@ -192,6 +193,10 @@ export class UserController extends AccessBaseController {
         return this.json(user, 200);
       }
     })
+  }
+
+  private createLoginLink(id: string) {
+    return process.env.FRONTEND_ACCOUNTS_APP_HOST + `/login?auth=${id}`;
   }
 
 }
