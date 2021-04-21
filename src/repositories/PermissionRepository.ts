@@ -7,4 +7,9 @@ export class PermissionRepository {
             .then((rows: Permission[]) => { return rows; });
     }
 
+    public async loadAll(): Promise<Permission[]> {
+        return DB.query("SELECT * FROM permissions ORDER BY apiName, displaySection, displayAction", [])
+            .then((rows: Permission[]) => { return rows; });
+    }
+
 }
