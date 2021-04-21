@@ -7,7 +7,7 @@ import { Permissions, IPermission } from '../helpers'
 
 @controller("/roles")
 export class RoleController extends AccessBaseController {
-
+    // TODO: To be removed. As roles are not app secific anymore.
     @httpGet("/app/:appName")
     public async loadAll(@requestParam("appName") appName: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
@@ -16,6 +16,16 @@ export class RoleController extends AccessBaseController {
             if (!hasAccess) return this.json({}, 401);
             else return this.json(roles, 200);
         });
+    }
+
+    @httpGet("/church/:churchId")
+    public async loadByChurchId(@requestParam("churchId") churchId: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
+        return this.actionWrapper(req, res, async (au) => {
+            if (!au.checkAccess(Permissions.roles.view)) return this.json({}, 401);
+            else {
+                return this.repositories.role.convertAllToModel(churchId, await this.repositories.role.loadByChurchId(churchId));
+            }
+        })
     }
 
     @httpGet("/:id")

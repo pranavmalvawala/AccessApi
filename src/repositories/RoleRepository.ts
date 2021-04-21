@@ -11,15 +11,15 @@ export class RoleRepository {
     public async create(role: Role) {
         role.id = UniqueIdHelper.shortId();
         return DB.query(
-            "INSERT INTO roles (id, churchId, appName, name) VALUES (?, ?, ?, ?);",
-            [role.id, role.churchId, role.appName, role.name]
+            "INSERT INTO roles (id, churchId, name) VALUES (?, ?, ?);",
+            [role.id, role.churchId, role.name]
         ).then(() => { return role; });
     }
 
     public async update(role: Role) {
         return DB.query(
-            "UPDATE roles SET appName=?, name=? WHERE id=?",
-            [role.appName, role.name, role.id]
+            "UPDATE roles SET name=? WHERE id=?",
+            [role.name, role.id]
         ).then(() => { return role });
     }
 
@@ -54,7 +54,19 @@ export class RoleRepository {
         return DB.query("SELECT * FROM roles", []).then((rows: Role[]) => { return rows; });
     }
 
+    public async loadByChurchId(id: string) {
+        return DB.query("SELECT * FROM roles WHERE churchId=?", [id]).then((rows: Role[]) => rows);
+    }
 
+    public convertToModel(churchId: string, data: any) {
+        const result: Role = { id: data.id, churchId: data.churchId, name: data.name }
+        return result;
+    }
 
+    public async convertAllToModel(churchId: string, data: any[]) {
+        const result: Role[] = [];
+        data.forEach(r => result.push(this.convertToModel(churchId, r)));
+        return result;
+    }
 
 }
