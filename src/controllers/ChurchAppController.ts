@@ -3,6 +3,7 @@ import { Role, RoleMember, RolePermission, ChurchApp } from "../models";
 import express from "express";
 import { AccessBaseController } from "./AccessBaseController"
 import { AuthenticatedUser } from "../auth";
+import { Utils } from '../helpers';
 
 @controller("/churchApps")
 export class ChurchAppController extends AccessBaseController {
@@ -41,7 +42,7 @@ export class ChurchAppController extends AccessBaseController {
                 let churchApp: ChurchApp = { churchId: au.churchId, appName: req.body.appName }
                 churchApp = await this.repositories.churchApp.save(churchApp);
 
-                let role: Role = { appName: req.body.appName, churchId: au.churchId, name: "Administrators" };
+                let role: Role = { churchId: au.churchId, name: `${Utils.convertToTitleCase(req.body.appName)} Administrators` };
                 role = await this.repositories.role.save(role);
 
                 let member: RoleMember = { churchId: au.churchId, addedBy: au.churchId, roleId: role.id, userId: au.id };

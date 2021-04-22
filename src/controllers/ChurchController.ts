@@ -210,7 +210,7 @@ export class ChurchController extends AccessBaseController {
         churchApp = await this.repositories.churchApp.save(churchApp);
 
         // create Super Admins role
-        let role: Role = { churchId: church.id, appName: "AccessManagement", name: "Domain Admins" };
+        let role: Role = { churchId: church.id, name: "Domain Admins" };
         role = await this.repositories.role.save(role);
 
         // add user to role
