@@ -43,13 +43,6 @@ export class RoleRepository {
         ).then((rows: Role[]) => { return rows; });
     }
 
-    public async loadByAppName(appName: string, churchId: string) {
-        return DB.query(
-            "SELECT * FROM roles WHERE appName=? and churchId=?",
-            [appName, churchId]
-        ).then((rows: Role[]) => { return rows; });
-    }
-
     public async loadAll() {
         return DB.query("SELECT * FROM roles", []).then((rows: Role[]) => { return rows; });
     }
