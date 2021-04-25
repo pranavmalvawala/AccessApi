@@ -11,10 +11,12 @@ export class RolePermissionController extends AccessBaseController {
     @httpGet("/roles/:id")
     public async loadByRole(@requestParam("id") id: string, req: express.Request<{}, {}, []>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async (au) => {
-            const permissions = await this.repositories.rolePermission.loadByRoleId(au.churchId, id);
-            const hasAccess = await this.checkAccess(permissions, Permissions.rolePermissions.view, au);
-            if (!hasAccess) return this.json({}, 401);
+            if (!au.checkAccess(Permissions.rolePermissions.view)) return this.json({}, 401);
             else {
+                let permissions: RolePermission[] = [];
+                if (id === "null") permissions = await this.repositories.rolePermission.loadForEveryone(au.churchId);
+                else permissions = await this.repositories.rolePermission.loadByRoleId(au.churchId, id);
+
                 return this.json(permissions, 200);
             }
         });
