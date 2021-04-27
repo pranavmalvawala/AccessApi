@@ -117,4 +117,9 @@ export class RolePermissionRepository {
         return DB.query("SELECT * FROM rolePermissions WHERE churchId=? AND roleId=?", [churchId, roleId]);
     }
 
+    // permissions applied to all the members of church
+    public async loadForEveryone(churchId: string) {
+        return DB.query("SELECT * FROM rolePermissions WHERE churchId=? AND roleId IS NULL", [churchId]);
+    }
+
 }
