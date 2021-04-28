@@ -4,32 +4,32 @@ import { UniqueIdHelper } from "../helpers";
 
 export class RolePermissionRepository {
 
-    public async save(rolePermission: RolePermission) {
+    public save(rolePermission: RolePermission) {
         if (UniqueIdHelper.isMissing(rolePermission.id)) return this.create(rolePermission); else return this.update(rolePermission);
     }
 
     public async create(rolePermission: RolePermission) {
         rolePermission.id = UniqueIdHelper.shortId();
-        return DB.query(
-            "INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, contentId, action) VALUES (?, ?, ?, ?, ?, ?, ?);",
-            [rolePermission.id, rolePermission.churchId, rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action]
-        ).then((row: any) => { return rolePermission; });
+        const sql = "INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, contentId, action) VALUES (?, ?, ?, ?, ?, ?, ?);";
+        const params = [rolePermission.id, rolePermission.churchId, rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action];
+        await DB.query(sql, params);
+        return rolePermission;
     }
 
     public async update(rolePermission: RolePermission) {
-        return DB.query(
-            "UPDATE rolePermissions SET roleId=?, apiName=?, contentType=?, contentId=?, action=? WHERE id=? AND churchId=?",
-            [rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action, rolePermission.id, rolePermission.churchId]
-        ).then(() => { return rolePermission });
+        const sql = "UPDATE rolePermissions SET roleId=?, apiName=?, contentType=?, contentId=?, action=? WHERE id=? AND churchId=?";
+        const params = [rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action, rolePermission.id, rolePermission.churchId];
+        await DB.query(sql, params);
+        return rolePermission;
     }
 
-    public async deleteForRole(churchId: string, roleId: string) {
+    public deleteForRole(churchId: string, roleId: string) {
         const sql = "DELETE FROM rolePermissions WHERE churchId=? AND roleId=?"
         const params = [churchId, roleId];
         return DB.query(sql, params);
     }
 
-    public async delete(churchId: string, id: string) {
+    public delete(churchId: string, id: string) {
         const sql = "DELETE FROM rolePermissions WHERE churchId=? AND id=?"
         const params = [churchId, id];
         return DB.query(sql, params);
@@ -113,12 +113,12 @@ export class RolePermissionRepository {
         return true;
     }
 
-    public async loadByRoleId(churchId: string, roleId: string): Promise<RolePermission[]> {
+    public loadByRoleId(churchId: string, roleId: string): Promise<RolePermission[]> {
         return DB.query("SELECT * FROM rolePermissions WHERE churchId=? AND roleId=?", [churchId, roleId]);
     }
 
     // permissions applied to all the members of church
-    public async loadForEveryone(churchId: string) {
+    public loadForEveryone(churchId: string) {
         return DB.query("SELECT * FROM rolePermissions WHERE churchId=? AND roleId IS NULL", [churchId]);
     }
 

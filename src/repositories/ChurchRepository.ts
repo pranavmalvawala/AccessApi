@@ -9,11 +9,11 @@ export class ChurchRepository {
     return parseInt(data.count, 0);
   }
 
-  public async loadAll() {
+  public loadAll() {
     return DB.query("SELECT * FROM churches ORDER BY name", []).then((rows: Church[]) => { return rows; });
   }
 
-  public async search(name: string, app: string) {
+  public search(name: string, app: string) {
     let query = "SELECT * FROM churches WHERE name like ?";
     const params = ["%" + name.replace(" ", "%") + "%"];
     if (app !== undefined && app !== "") {
@@ -24,15 +24,15 @@ export class ChurchRepository {
     return DB.query(query, params).then((rows: Church[]) => { return rows; });
   }
 
-  public async loadBySubDomain(subDomain: string) {
+  public loadBySubDomain(subDomain: string) {
     return DB.queryOne("SELECT * FROM churches WHERE subDomain=?;", [subDomain]);
   }
 
-  public async loadById(id: string) {
+  public loadById(id: string) {
     return DB.queryOne("SELECT * FROM churches WHERE id=?;", [id]);
   }
 
-  public async save(church: Church) {
+  public save(church: Church) {
     if (UniqueIdHelper.isMissing(church.id)) return this.create(church); else return this.update(church);
   }
 
@@ -40,13 +40,15 @@ export class ChurchRepository {
     church.id = UniqueIdHelper.shortId();
     const sql = "INSERT INTO churches (id, name, subDomain, registrationDate, address1, address2, city, state, zip, country) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?);";
     const params = [church.id, church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country]
-    return DB.query(sql, params).then(() => { return church; });
+    await DB.query(sql, params);
+    return church;
   }
 
   public async update(church: Church) {
     const sql = "UPDATE churches SET name=?, subDomain=?, address1=?, address2=?, city=?, state=?, zip=?, country=? WHERE id=?;";
     const params = [church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country, church.id]
-    return DB.query(sql, params).then(() => { return church });
+    await DB.query(sql, params);
+    return church;
   }
 
 

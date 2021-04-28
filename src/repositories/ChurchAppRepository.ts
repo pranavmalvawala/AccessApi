@@ -4,19 +4,19 @@ import { UniqueIdHelper } from "../helpers";
 
 export class ChurchAppRepository {
 
-    public async loadById(id: string) {
+    public loadById(id: string) {
         return DB.queryOne("SELECT * FROM churchApps WHERE id=?;", [id]);
     }
 
-    public async loadByChurchIdAppName(churchId: string, appName: string) {
+    public loadByChurchIdAppName(churchId: string, appName: string) {
         return DB.queryOne("SELECT * FROM churchApps WHERE churchId=? AND appName=?;", [churchId, appName]);
     }
 
-    public async loadForChurch(churchId: string) {
+    public loadForChurch(churchId: string) {
         return DB.query("SELECT * FROM churchApps WHERE churchId=? ORDER BY appName", [churchId]).then((rows: ChurchApp[]) => { return rows; });
     }
 
-    public async save(churchApp: ChurchApp) {
+    public save(churchApp: ChurchApp) {
         if (UniqueIdHelper.isMissing(churchApp.id)) return this.create(churchApp); else return this.update(churchApp);
     }
 
@@ -24,13 +24,15 @@ export class ChurchAppRepository {
         churchApp.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO churchApps (id, churchId, appName, registrationDate) VALUES (?, ?, ?, NOW());";
         const params = [churchApp.id, churchApp.churchId, churchApp.appName];
-        return DB.query(sql, params).then((row: any) => { return churchApp; });
+        await DB.query(sql, params);
+        return churchApp;
     }
 
     public async update(churchApp: ChurchApp) {
         const sql = "UPDATE churchApps SET churchId=?, appName=? WHERE id=?;";
-        const params = [churchApp.churchId, churchApp.appName, churchApp.id]
-        return DB.query(sql, params).then(() => { return churchApp });
+        const params = [churchApp.churchId, churchApp.appName, churchApp.id];
+        await DB.query(sql, params)
+        return churchApp;
     }
 
     public convertToModel(data: any) {
