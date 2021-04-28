@@ -1,13 +1,12 @@
 import { DB } from "../apiBase/db";
 import { Application } from "../models";
-import { UniqueIdHelper } from "../helpers";
 
 export class ApplicationRepository {
-    public async loadAll() {
+    public loadAll() {
         return DB.query("SELECT * FROM applications ORDER BY name", []).then((rows: Application[]) => { return rows; });
     }
 
-    public async loadByKeyName(keyName: string) {
+    public loadByKeyName(keyName: string) {
         return DB.queryOne("SELECT * FROM applications WHERE keyName=?", [keyName]).then((row: Application) => { return row; });
     }
 

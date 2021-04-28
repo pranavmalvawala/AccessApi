@@ -4,45 +4,45 @@ import { UniqueIdHelper, DateTimeHelper } from "../helpers";
 
 export class UserRepository {
 
-  public async save(user: User) {
+  public save(user: User) {
     if (UniqueIdHelper.isMissing(user.id)) return this.create(user); else return this.update(user);
   }
 
   public async create(user: User) {
     user.id = UniqueIdHelper.shortId();
-    return DB.query(
-      "INSERT INTO users (id, email, password, authGuid, displayName) VALUES (?, ?, ?, ?, ?);",
-      [user.id, user.email, user.password, user.authGuid, user.displayName]
-    ).then(() => { return user; });
+    const sql = "INSERT INTO users (id, email, password, authGuid, displayName) VALUES (?, ?, ?, ?, ?);";
+    const params = [user.id, user.email, user.password, user.authGuid, user.displayName];
+    await DB.query(sql, params);
+    return user;
   }
 
   public async update(user: User) {
     const registrationDate = DateTimeHelper.toMysqlDate(user.registrationDate);
     const lastLogin = DateTimeHelper.toMysqlDate(user.lastLogin);
-    return DB.query(
-      "UPDATE users SET email=?, password=?, authGuid=?, displayName=?, registrationDate=?, lastLogin=? WHERE id=?;",
-      [user.email, user.password, user.authGuid, user.displayName, registrationDate, lastLogin, user.id]
-    ).then(() => { return user });
+    const sql = "UPDATE users SET email=?, password=?, authGuid=?, displayName=?, registrationDate=?, lastLogin=? WHERE id=?;";
+    const params = [user.email, user.password, user.authGuid, user.displayName, registrationDate, lastLogin, user.id];
+    await DB.query(sql, params);
+    return user;
   }
 
 
-  public async load(id: string): Promise<User> {
+  public load(id: string): Promise<User> {
     return DB.queryOne("SELECT * FROM users WHERE id=?", [id]);
   }
 
-  public async loadByEmail(email: string): Promise<User> {
+  public loadByEmail(email: string): Promise<User> {
     return DB.queryOne("SELECT * FROM users WHERE email=?", [email]);
   }
 
-  public async loadByAuthGuid(authGuid: string): Promise<User> {
+  public loadByAuthGuid(authGuid: string): Promise<User> {
     return DB.queryOne("SELECT * FROM users WHERE authGuid=?", [authGuid]);
   }
 
-  public async loadByEmailPassword(email: string, hashedPassword: string): Promise<User> {
+  public loadByEmailPassword(email: string, hashedPassword: string): Promise<User> {
     return DB.queryOne("SELECT * FROM users WHERE email=? AND password=?", [email, hashedPassword]);
   }
 
-  public async loadByIds(ids: string[]): Promise<User[]> {
+  public loadByIds(ids: string[]): Promise<User[]> {
     return DB.query("SELECT * FROM users WHERE id IN (?)", [ids]);
   }
 

@@ -4,50 +4,50 @@ import { UniqueIdHelper } from "../helpers";
 
 export class RoleRepository {
 
-    public async save(role: Role) {
+    public save(role: Role) {
         if (UniqueIdHelper.isMissing(role.id)) return this.create(role); else return this.update(role);
     }
 
     public async create(role: Role) {
         role.id = UniqueIdHelper.shortId();
-        return DB.query(
-            "INSERT INTO roles (id, churchId, name) VALUES (?, ?, ?);",
-            [role.id, role.churchId, role.name]
-        ).then(() => { return role; });
+        const sql = "INSERT INTO roles (id, churchId, name) VALUES (?, ?, ?);";
+        const params = [role.id, role.churchId, role.name];
+        await DB.query(sql, params);
+        return role;
     }
 
     public async update(role: Role) {
-        return DB.query(
-            "UPDATE roles SET name=? WHERE id=?",
-            [role.name, role.id]
-        ).then(() => { return role });
+        const sql = "UPDATE roles SET name=? WHERE id=?";
+        const params = [role.name, role.id];
+        await DB.query(sql, params);
+        return role;
     }
 
-    public async delete(churchId: string, id: string) {
+    public delete(churchId: string, id: string) {
         const sql = "DELETE FROM roles WHERE id=? AND churchId=?"
         const params = [id, churchId];
         return DB.query(sql, params);
     }
 
-    public async loadById(churchId: string, id: string) {
+    public loadById(churchId: string, id: string) {
         return DB.queryOne(
             "SELECT * FROM roles WHERE churchId=? AND id=?",
             [churchId, id]
         ).then((row: Role) => { return row });
     }
 
-    public async loadByIds(ids: string[]) {
+    public loadByIds(ids: string[]) {
         return DB.query(
             "SELECT * FROM roles WHERE id IN (?)",
             [ids]
         ).then((rows: Role[]) => { return rows; });
     }
 
-    public async loadAll() {
+    public loadAll() {
         return DB.query("SELECT * FROM roles", []).then((rows: Role[]) => { return rows; });
     }
 
-    public async loadByChurchId(id: string) {
+    public loadByChurchId(id: string) {
         return DB.query("SELECT * FROM roles WHERE churchId=?", [id]).then((rows: Role[]) => rows);
     }
 
@@ -56,7 +56,7 @@ export class RoleRepository {
         return result;
     }
 
-    public async convertAllToModel(churchId: string, data: any[]) {
+    public convertAllToModel(churchId: string, data: any[]) {
         const result: Role[] = [];
         data.forEach(r => result.push(this.convertToModel(churchId, r)));
         return result;
