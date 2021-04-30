@@ -41,7 +41,7 @@ export class RolePermissionRepository {
         const query = "SELECT c.name AS churchName, r.churchId, c.subDomain, rp.apiName, rp.contentType, rp.contentId, rp.action"
             + " FROM roleMembers rm"
             + " INNER JOIN roles r on r.id=rm.roleId"
-            + " INNER JOIN rolePermissions rp on rp.roleId=r.id"
+            + " INNER JOIN rolePermissions rp on (rp.roleId=r.id or (rp.roleId IS NULL AND rp.churchId=rm.churchId))"
             + " LEFT JOIN churches c on c.id=r.churchId"
             + " WHERE rm.userId=?"
             + " GROUP BY c.name, r.churchId, rp.apiName, rp.contentType, rp.contentId, rp.action"
@@ -65,24 +65,6 @@ export class RolePermissionRepository {
             const permission: RolePermission = { action: row.action, contentId: row.contentId, contentType: row.contentType }
             currentApi.permissions.push(permission);
         });
-
-        // TODO: clean up
-        const churchIds = result.map(r => r.id);
-        const permissionForEveryone: RolePermission[] = await this.loadForEveryone(churchIds);
-        permissionForEveryone.forEach(p => {
-            result.forEach(r => {
-                if (r.id === p.churchId) {
-                    r.apis.forEach(a => {
-                        if (a.keyName === p.apiName) {
-                            const permission: RolePermission = { action: p.action, contentId: p.contentId, contentType: p.contentType }
-                            if (!a.permissions.some(s => s.contentType === permission.contentType && s.action === permission.action)) {
-                                a.permissions = [...a.permissions, permission];
-                            }
-                        }
-                    })
-                }
-            })
-        })
 
         if (this.applyUniversal(result) && removeUniversal) result.splice(0, 1);
         return result;
@@ -137,9 +119,8 @@ export class RolePermissionRepository {
     }
 
     // permissions applied to all the members of church
-    public loadForEveryone(ids: string[]) {
-        const quotedAndCommaSeparated = ids.length === 0 ? "" : "'" + ids.join("','") + "'";
-        return DB.query("SELECT * FROM rolePermissions WHERE churchId IN (" + quotedAndCommaSeparated + ") AND roleId IS NULL", []);
+    public loadForEveryone(churchId: string) {
+        return DB.query("SELECT * FROM rolePermissions WHERE churchId=? AND roleId IS NULL", [churchId]);
     }
 
 }

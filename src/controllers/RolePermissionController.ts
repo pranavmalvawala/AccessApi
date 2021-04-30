@@ -15,7 +15,7 @@ export class RolePermissionController extends AccessBaseController {
             else {
                 let permissions: RolePermission[] = [];
                 // when "id" is null, return roles associated with every member of church
-                if (id === "null") permissions = await this.repositories.rolePermission.loadForEveryone([au.churchId]);
+                if (id === "null") permissions = await this.repositories.rolePermission.loadForEveryone(au.churchId);
                 else permissions = await this.repositories.rolePermission.loadByRoleId(au.churchId, id);
 
                 return this.json(permissions, 200);
