@@ -41,7 +41,7 @@ export class RolePermissionRepository {
         const query = "SELECT c.name AS churchName, r.churchId, c.subDomain, rp.apiName, rp.contentType, rp.contentId, rp.action"
             + " FROM roleMembers rm"
             + " INNER JOIN roles r on r.id=rm.roleId"
-            + " INNER JOIN rolePermissions rp on rp.roleId=r.id"
+            + " INNER JOIN rolePermissions rp on (rp.roleId=r.id or (rp.roleId IS NULL AND rp.churchId=rm.churchId))"
             + " LEFT JOIN churches c on c.id=r.churchId"
             + " WHERE rm.userId=?"
             + " GROUP BY c.name, r.churchId, rp.apiName, rp.contentType, rp.contentId, rp.action"
@@ -65,6 +65,7 @@ export class RolePermissionRepository {
             const permission: RolePermission = { action: row.action, contentId: row.contentId, contentType: row.contentType }
             currentApi.permissions.push(permission);
         });
+
         if (this.applyUniversal(result) && removeUniversal) result.splice(0, 1);
         return result;
     }
