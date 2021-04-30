@@ -32,6 +32,7 @@ INSERT INTO permissions (id, apiName, section, action, displaySection, displayAc
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m5', 'MembershipApi', 'Group Members', 'View', 'Groups', 'View Group Members');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m6', 'MembershipApi', 'Groups', 'Edit', 'Groups', 'Edit Groups');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m7', 'MembershipApi', 'Groups', 'View', 'Groups', 'View Groups');
+INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m12', 'MembershipApi', 'People', 'Edit Self', 'People', 'Edit Self');
 
 INSERT INTO apis (id, keyName, name) VALUES ('g1', 'GivingApi', 'Giving');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g2', 'GivingApi', 'Donations', 'Edit', 'Donations', 'Edit Donations');
