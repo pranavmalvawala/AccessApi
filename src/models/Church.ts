@@ -1,4 +1,4 @@
-import { Api } from '.'
+import { Api, ChurchApp } from '.'
 export class Church {
   public id?: string;
   public name: string;
@@ -12,4 +12,5 @@ export class Church {
   public registrationDate?: Date;
   public apis?: Api[];
   public jwt?: string;
+  public apps?: ChurchApp[];
 }
