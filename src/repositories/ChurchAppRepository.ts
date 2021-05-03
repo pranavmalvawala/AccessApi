@@ -1,6 +1,6 @@
 import { DB } from "../apiBase/db";
 import { ChurchApp } from "../models";
-import { UniqueIdHelper } from "../helpers";
+import { UniqueIdHelper, MySqlHelper } from "../helpers";
 
 export class ChurchAppRepository {
 
@@ -14,6 +14,10 @@ export class ChurchAppRepository {
 
     public loadForChurch(churchId: string) {
         return DB.query("SELECT * FROM churchApps WHERE churchId=? ORDER BY appName", [churchId]).then((rows: ChurchApp[]) => { return rows; });
+    }
+
+    public loadForChurches(churchIds: string[]) {
+        return DB.query("SELECT * FROM churchApps WHERE churchId IN (" + MySqlHelper.toQuotedAndCommaSeparatedString(churchIds) + ") ORDER BY churchId", []);
     }
 
     public save(churchApp: ChurchApp) {

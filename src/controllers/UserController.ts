@@ -1,7 +1,7 @@
 import { controller, httpGet, httpPost, interfaces, requestParam } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
-import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, Church, EmailPassword } from "../models";
+import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, Church, EmailPassword, ChurchApp } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, Permissions } from "../helpers";
@@ -33,7 +33,7 @@ export class UserController extends AccessBaseController {
 
       if (user === null) return this.denyAccess(["Login failed"]);
       else {
-        const churches = await this.repositories.rolePermission.loadForUser(user.id, true)  // Set to true so churches[0] is always a real church.  Not sre why it was false before.  If we need to change this make it a param on the login request
+        const churches = await this.getChurches(user.id)
         const result = await AuthenticatedUser.login(churches, user);
         if (result === null) return this.denyAccess(["No permissions"]);
         else return this.json(result, 200);
@@ -42,6 +42,16 @@ export class UserController extends AccessBaseController {
       this.logger.error(e);
       return this.error([e.toString()]);
     }
+  }
+
+  private async getChurches(id: string): Promise<Church[]> {
+    const churches = await this.repositories.rolePermission.loadForUser(id, true)  // Set to true so churches[0] is always a real church.  Not sre why it was false before.  If we need to change this make it a param on the login request
+    const churchApps: { [key: string]: ChurchApp[] } = {};
+    churches.forEach(c => { churchApps[c.id] = [] });
+    const apps: ChurchApp[] = await this.repositories.churchApp.loadForChurches(Object.keys(churchApps));
+    apps.forEach(c => { churchApps[c.churchId].push(c) });
+
+    return churches.map(c => { c.apps = churchApps[c.id]; return c });
   }
 
   @httpPost("/verifyCredentials")
