@@ -231,6 +231,7 @@ export class ChurchController extends AccessBaseController {
         permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "People", null, "Edit"));
         permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "Households", null, "Edit"));
         permissions.push(new RolePermission(church.id, null, "MembershipApi", "People", null, "Edit Self"));
+        permissions.push(new RolePermission(church.id, null, "AttendanceApi", "Attendance", null, "Checkin Household"));
 
         const promises: Promise<any>[] = [];
         permissions.forEach((permission) => promises.push(this.repositories.rolePermission.save(permission)));
