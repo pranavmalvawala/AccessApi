@@ -7,7 +7,7 @@ import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
 import { Utils, Permissions } from "../helpers";
 import { Repositories } from "../repositories";
-import { ArrayHelper } from "../apiBase";
+import { ArrayHelper, EmailHelper } from "../apiBase";
 
 @controller("/churches")
 export class ChurchController extends AccessBaseController {
@@ -126,8 +126,11 @@ export class ChurchController extends AccessBaseController {
     if (Utils.isEmpty(church.name)) result.push("Church name required");
     if (Utils.isEmpty(church.subDomain)) result.push("Subdomain required");
     else {
-      const c = await repositories.church.loadBySubDomain(church.subDomain);
-      if (c !== null && c.id !== church.id) result.push("Subdomain unavailable");
+      if (/^([a-z0-9]{1,99})$/.test(church.subDomain) === false) result.push("Please enter only lower case letters and numbers for the subdomain.  Example: firstchurch");
+      else {
+        const c = await repositories.church.loadBySubDomain(church.subDomain);
+        if (c !== null && c.id !== church.id) result.push("Subdomain unavailable");
+      }
     }
 
     return result;
@@ -166,8 +169,11 @@ export class ChurchController extends AccessBaseController {
 
     // Verify subdomain isn't taken
     if (subDomain !== undefined && subDomain !== null && subDomain !== "") {
-      const church = await this.repositories.church.loadBySubDomain(subDomain);
-      if (church !== null) result.push("Subdomain unavailable");
+      if (/^([a-z0-9]{1,99})$/.test(subDomain) === false) result.push("Please enter only lower case letters and numbers for the subdomain.  Example: firstchurch");
+      else {
+        const church = await this.repositories.church.loadBySubDomain(subDomain);
+        if (church !== null) result.push("Subdomain unavailable");
+      }
     }
 
     return result;
@@ -239,6 +245,16 @@ export class ChurchController extends AccessBaseController {
 
         const churches = await this.repositories.rolePermission.loadForUser(user.id, true)
         const result = await AuthenticatedUser.login(churches, user);
+
+        if (process.env.EMAIL_ON_REGISTRATION === "true") {
+          await EmailHelper.sendEmail({
+            from: process.env.SUPPORT_EMAIL,
+            to: process.env.SUPPORT_EMAIL,
+            subject: "New Church Registration",
+            body: church.name
+          });
+        }
+
         return this.json(result, 200);
       }
     } catch (e) {
