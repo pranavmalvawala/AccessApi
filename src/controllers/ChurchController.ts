@@ -1,5 +1,5 @@
 import { controller, httpPost, httpGet, interfaces, requestParam } from "inversify-express-utils";
-import { RegistrationRequest, Church, Role, RoleMember, RolePermission, User, ChurchApp } from "../models";
+import { RegistrationRequest, Church, Role, RoleMember, RolePermission, User, ChurchApp, Api } from "../models";
 import express from "express";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
@@ -271,6 +271,44 @@ export class ChurchController extends AccessBaseController {
       if (church.settings === undefined) church.settings = [];
       church.settings.push(s);
     });
+  }
+
+  @httpGet("/select/:churchId")
+  public async select(@requestParam("churchId") churchId: string, req: express.Request, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapper(req, res, async (au) => {
+      const church = await this.fetchChurchPermissions(au.id, churchId)
+      const user = await this.repositories.user.load(au.id);
+
+      const data = await AuthenticatedUser.login([church], user);
+      return this.json(data.churches[0], 200);
+    })
+  }
+
+  private async fetchChurchPermissions(userId: string, churchId: string): Promise<Church> {
+    // church includes user role permission and everyone permission.
+    const church = await this.repositories.rolePermission.loadUserPermissionInChurch(userId, churchId);
+
+    if (church) return church;
+
+    const everyonePermission = await this.repositories.rolePermission.loadForEveryone(churchId);
+    let result: Church = null;
+    let currentApi: Api = null;
+    everyonePermission.forEach((row: any) => {
+        if (result === null) {
+            result = { id: row.churchId, subDomain: row.subDomain, name: row.churchName, apis: [] };
+            currentApi = null;
+        }
+
+        if (currentApi === null || row.apiName !== currentApi.keyName) {
+            currentApi = { keyName: row.apiName, permissions: [] };
+            result.apis.push(currentApi);
+        }
+
+        const permission: RolePermission = { action: row.action, contentId: row.contentId, contentType: row.contentType }
+        currentApi.permissions.push(permission);
+    });
+
+    return result;
   }
 
 }
