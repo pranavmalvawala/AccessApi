@@ -101,6 +101,38 @@ export class RolePermissionRepository {
         return result;
     }
 
+    public async loadUserPermissionInChurch(userId: string, churchId: string) {
+        const query = "SELECT c.name AS churchName, r.churchId, c.subDomain, rp.apiName, rp.contentType, rp.contentId, rp.action"
+        + " FROM roleMembers rm"
+        + " INNER JOIN roles r on r.id=rm.roleId"
+        + " INNER JOIN rolePermissions rp on (rp.roleId=r.id or (rp.roleId IS NULL AND rp.churchId=rm.churchId))"
+        + " LEFT JOIN churches c on c.id=r.churchId"
+        + " WHERE rm.userId=? AND rm.churchId=?"
+        + " GROUP BY c.name, r.churchId, rp.apiName, rp.contentType, rp.contentId, rp.action"
+        + " ORDER BY c.name, r.churchId, rp.apiName, rp.contentType, rp.contentId, rp.action";
+        const data = await DB.query(query, [userId, churchId]);
+
+        let result: Church = null;
+        let currentApi: Api = null;
+
+        data.forEach((row: any) => {
+            if (result === null) {
+                result = { id: row.churchId, subDomain: row.subDomain, name: row.churchName, apis: [] };
+                currentApi = null;
+            }
+
+            if (currentApi === null || row.apiName !== currentApi.keyName) {
+                currentApi = { keyName: row.apiName, permissions: [] };
+                result.apis.push(currentApi);
+            }
+
+            const permission: RolePermission = { action: row.action, contentId: row.contentId, contentType: row.contentType }
+            currentApi.permissions.push(permission);
+        });
+
+        return result;
+    }
+
     // Apply site admin priviledges that aren't tied to a specific church.
     private applyUniversal(churches: Church[]) {
         if (churches.length < 2 || churches[0].id !== "0") return false;
@@ -120,7 +152,7 @@ export class RolePermissionRepository {
 
     // permissions applied to all the members of church
     public loadForEveryone(churchId: string) {
-        return DB.query("SELECT * FROM rolePermissions WHERE churchId=? AND roleId IS NULL", [churchId]);
+        return DB.query("SELECT rp.id, rp.churchId, rp.roleId, rp.apiName, rp.contentType, rp.contentId, rp.action, c.name AS churchName, c.subDomain FROM rolePermissions rp LEFT JOIN churches c on c.id=rp.churchId WHERE rp.churchId=? AND rp.roleId IS NULL", [churchId]);
     }
 
 }
