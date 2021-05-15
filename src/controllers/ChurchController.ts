@@ -273,6 +273,7 @@ export class ChurchController extends AccessBaseController {
     });
   }
 
+  // if both values (churchId and subDomain) are found in body, churchId will have first preference.
   @httpPost("/select")
   public async select(req: express.Request<{}, {}, {churchId: string, subDomain: string}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
