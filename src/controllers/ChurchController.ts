@@ -273,9 +273,15 @@ export class ChurchController extends AccessBaseController {
     });
   }
 
-  @httpGet("/select/:churchId")
-  public async select(@requestParam("churchId") churchId: string, req: express.Request, res: express.Response): Promise<interfaces.IHttpActionResult> {
+  // if both values (churchId and subDomain) are found in body, churchId will have first preference.
+  @httpPost("/select")
+  public async select(req: express.Request<{}, {}, {churchId: string, subDomain: string}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
+      let { churchId } = req.body;
+      if (req.body.subDomain && !churchId) {
+        const selectedChurch: Church = await this.repositories.church.loadBySubDomain(req.body.subDomain);
+        churchId = selectedChurch.id;
+      }
       const church = await this.fetchChurchPermissions(au.id, churchId)
       const user = await this.repositories.user.load(au.id);
 
