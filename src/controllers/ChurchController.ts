@@ -48,11 +48,11 @@ export class ChurchController extends AccessBaseController {
       if (req.query.subDomain !== undefined) {
         const data = await this.repositories.church.loadBySubDomain(req.query.subDomain.toString());
         const church = this.repositories.church.convertToModel(data);
-        result = { id: church.id };
+        result = { id: church.id, name: church.name, subDomain: church.subDomain };
       } else if (req.query.id !== undefined) {
         const data = await this.repositories.church.loadById(req.query.id.toString());
         const church = this.repositories.church.convertToModel(data);
-        result = { subDomain: church.subDomain };
+        result = { id: church.id, name: church.name, subDomain: church.subDomain };
       }
       return this.json(result, 200);
     } catch (e) {
@@ -275,7 +275,7 @@ export class ChurchController extends AccessBaseController {
 
   // if both values (churchId and subDomain) are found in body, churchId will have first preference.
   @httpPost("/select")
-  public async select(req: express.Request<{}, {}, {churchId: string, subDomain: string}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+  public async select(req: express.Request<{}, {}, { churchId: string, subDomain: string }>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
       let { churchId } = req.body;
       if (req.body.subDomain && !churchId) {
@@ -300,18 +300,18 @@ export class ChurchController extends AccessBaseController {
     let result: Church = null;
     let currentApi: Api = null;
     everyonePermission.forEach((row: any) => {
-        if (result === null) {
-            result = { id: row.churchId, subDomain: row.subDomain, name: row.churchName, apis: [] };
-            currentApi = null;
-        }
+      if (result === null) {
+        result = { id: row.churchId, subDomain: row.subDomain, name: row.churchName, apis: [] };
+        currentApi = null;
+      }
 
-        if (currentApi === null || row.apiName !== currentApi.keyName) {
-            currentApi = { keyName: row.apiName, permissions: [] };
-            result.apis.push(currentApi);
-        }
+      if (currentApi === null || row.apiName !== currentApi.keyName) {
+        currentApi = { keyName: row.apiName, permissions: [] };
+        result.apis.push(currentApi);
+      }
 
-        const permission: RolePermission = { action: row.action, contentId: row.contentId, contentType: row.contentType }
-        currentApi.permissions.push(permission);
+      const permission: RolePermission = { action: row.action, contentId: row.contentId, contentType: row.contentType }
+      currentApi.permissions.push(permission);
     });
 
     return result;
