@@ -179,6 +179,62 @@ export class ChurchController extends AccessBaseController {
     return result;
   }
 
+  private async createDomainAdminsRole(church: Church, user: User) {
+    let role: Role = { churchId: church.id, name: "Domain Admins" };
+    role = await this.repositories.role.save(role);
+
+    let roleMember: RoleMember = { churchId: church.id, roleId: role.id, userId: user.id, addedBy: user.id }
+    roleMember = await this.repositories.roleMember.save(roleMember);
+
+    const permissions = [];
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Users", null, "View"));
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Users", null, "Edit"));
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Roles", null, "View"));
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Roles", null, "Edit"));
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RoleMembers", null, "View"));
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RoleMembers", null, "Edit"));
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RolePermissions", null, "View"));
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RolePermissions", null, "Edit"));
+    permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Settings", null, "Edit"));
+    permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "People", null, "View"));
+    permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "People", null, "Edit"));
+    permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "Households", null, "Edit"));
+
+    permissions.push(new RolePermission(church.id, null, "MembershipApi", "People", null, "Edit Self"));
+    permissions.push(new RolePermission(church.id, null, "AttendanceApi", "Attendance", null, "Checkin"));
+
+    const promises: Promise<any>[] = [];
+    permissions.forEach((permission) => promises.push(this.repositories.rolePermission.save(permission)));
+    await Promise.all(promises);
+  }
+
+  private async createAllMembersRole(church: Church, user: User) {
+    let role: Role = { churchId: church.id, name: "All Members" };
+    role = await this.repositories.role.save(role);
+
+    let roleMember: RoleMember = { churchId: church.id, roleId: role.id, userId: user.id, addedBy: user.id }
+    roleMember = await this.repositories.roleMember.save(roleMember);
+
+    const permissions = [];
+    permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "People", null, "View Members"));
+    permissions.push(new RolePermission(church.id, null, "MembershipApi", "People", null, "Edit Self"));
+    permissions.push(new RolePermission(church.id, null, "AttendanceApi", "Attendance", null, "Checkin"));
+
+    const promises: Promise<any>[] = [];
+    permissions.forEach((permission) => promises.push(this.repositories.rolePermission.save(permission)));
+    await Promise.all(promises);
+  }
+
+  private async addEveryonePermissions(church: Church, user: User) {
+    const permissions = [];
+    permissions.push(new RolePermission(church.id, null, "MembershipApi", "People", null, "Edit Self"));
+    permissions.push(new RolePermission(church.id, null, "AttendanceApi", "Attendance", null, "Checkin"));
+
+    const promises: Promise<any>[] = [];
+    permissions.forEach((permission) => promises.push(this.repositories.rolePermission.save(permission)));
+    await Promise.all(promises);
+  }
+
   @httpPost("/register")
   public async register(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<any> {
     try {
@@ -215,33 +271,9 @@ export class ChurchController extends AccessBaseController {
         let churchApp: ChurchApp = { churchId: church.id, appName: "AccessManagement", registrationDate: new Date() };
         churchApp = await this.repositories.churchApp.save(churchApp);
 
-        // create Super Admins role
-        let role: Role = { churchId: church.id, name: "Domain Admins" };
-        role = await this.repositories.role.save(role);
-
-        // add user to role
-        let roleMember: RoleMember = { churchId: church.id, roleId: role.id, userId: user.id, addedBy: user.id }
-        roleMember = await this.repositories.roleMember.save(roleMember);
-
-        // grant role permissions
-        const permissions = [];
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Users", null, "View"));
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Users", null, "Edit"));
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Roles", null, "View"));
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Roles", null, "Edit"));
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RoleMembers", null, "View"));
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RoleMembers", null, "Edit"));
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RolePermissions", null, "View"));
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "RolePermissions", null, "Edit"));
-        permissions.push(new RolePermission(church.id, role.id, "AccessApi", "Settings", null, "Edit"));
-        permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "People", null, "Edit"));
-        permissions.push(new RolePermission(church.id, role.id, "MembershipApi", "Households", null, "Edit"));
-        permissions.push(new RolePermission(church.id, null, "MembershipApi", "People", null, "Edit Self"));
-        permissions.push(new RolePermission(church.id, null, "AttendanceApi", "Attendance", null, "Checkin"));
-
-        const promises: Promise<any>[] = [];
-        permissions.forEach((permission) => promises.push(this.repositories.rolePermission.save(permission)));
-        await Promise.all(promises);
+        await this.createDomainAdminsRole(church, user);
+        await this.createAllMembersRole(church, user);
+        await this.addEveryonePermissions(church, user);
 
         const churches = await this.repositories.rolePermission.loadForUser(user.id, true)
         const result = await AuthenticatedUser.login(churches, user);
