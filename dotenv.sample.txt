@@ -21,4 +21,5 @@ EMAIL_ON_REGISTRATION=false
 
 
 # Frontend
-FRONTEND_ACCOUNTS_APP_HOST=https://accounts.staging.churchapps.org
+FRONTEND_ACCOUNTS_APP_HOST=http://localhost:3401
+CONTENT_ROOT=http://localhost:3402
