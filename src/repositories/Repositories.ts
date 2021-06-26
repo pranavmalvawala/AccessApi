@@ -1,4 +1,4 @@
-import { UserRepository, ChurchRepository, PermissionRepository, RoleRepository, RoleMemberRepository, RolePermissionRepository, ChurchAppRepository, ApplicationRepository } from ".";
+import { UserRepository, ChurchRepository, PermissionRepository, RoleRepository, RoleMemberRepository, RolePermissionRepository, ChurchAppRepository, ApplicationRepository, UserChurchRepository } from ".";
 
 export class Repositories {
   public application: ApplicationRepository;
@@ -9,6 +9,7 @@ export class Repositories {
   public roleMember: RoleMemberRepository;
   public rolePermission: RolePermissionRepository;
   public user: UserRepository;
+  public userChurch: UserChurchRepository;
   private static _current: Repositories = null;
 
   constructor() {
@@ -20,6 +21,7 @@ export class Repositories {
     this.roleMember = new RoleMemberRepository();
     this.rolePermission = new RolePermissionRepository();
     this.user = new UserRepository();
+    this.userChurch = new UserChurchRepository();
   }
 
   public static getCurrent = () => {

@@ -3,6 +3,7 @@ export class Church {
   public id?: string;
   public name: string;
   public subDomain?: string;
+  public personId?: string;
   public address1?: string;
   public address2?: string;
   public city?: string;

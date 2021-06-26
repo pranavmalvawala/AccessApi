@@ -23,11 +23,11 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
     public static getApiJwt(api: Api, user: User, church: Church) {
         const permList: string[] = [];
         api.permissions.forEach(p => { permList.push(p.contentType + "_" + String(p.contentId).replace('null', '') + "_" + p.action); });
-        return jwt.sign({ id: user.id, email: user.email, churchId: church.id, apiName: api.keyName, permissions: permList }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRATION });
+        return jwt.sign({ id: user.id, email: user.email, churchId: church.id, personId: church.personId, apiName: api.keyName, permissions: permList }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRATION });
     }
 
     public static getChurchJwt(user: User, church: Church) {
-        return jwt.sign({ id: user.id, email: user.email, churchId: church.id }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRATION });
+        return jwt.sign({ id: user.id, email: user.email, churchId: church.id, personId: church.personId }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRATION });
     }
 
     public static setJwt(allChurches: Church[], user: User) {

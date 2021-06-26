@@ -8,5 +8,6 @@ export { Permission } from "./Permission"
 export { Role } from "./Role"
 export { RoleMember } from "./RoleMember"
 export { RolePermission } from "./RolePermission";
+export { UserChurch } from './UserChurch';
 export * from "./requests";
 export * from "./responses";
