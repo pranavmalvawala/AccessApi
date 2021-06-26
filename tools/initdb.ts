@@ -18,6 +18,7 @@ const init = async () => {
     { title: "Role Permissions", file: "rolePermissions.mysql" },
     { title: "Roles", file: "roles.mysql" },
     { title: "Users", file: "users.mysql" },
+    { title: "User Churches", file:"userChurches.mysql" },
     { title: "Populate APIs", file: "populateApis.mysql" },
     { title: "Populate Data", file: "populateData.mysql" },
   ];
