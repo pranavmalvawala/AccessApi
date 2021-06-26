@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS `userChurches`
+DROP TABLE IF EXISTS `userChurches`;
 
 CREATE TABLE `userChurches` (
   `id` char(11) NOT NULL,
