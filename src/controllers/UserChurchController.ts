@@ -7,12 +7,12 @@ import { UserChurch } from "../models";
 export class UserChurchController extends AccessBaseController {
 
     @httpPost("/")
-    public async save(req: express.Request<{}, {}, UserChurch>, res: express.Response): Promise<any> {
+    public async save(req: express.Request<{}, {}, UserChurch, {userId: string}>, res: express.Response): Promise<any> {
         return this.actionWrapper(req, res, async ({id, churchId}) => {
-            const record = await this.repositories.userChurch.loadByUserId(id, churchId);
+            const record = await this.repositories.userChurch.loadByUserId(req.query.userId || id, churchId);
             if (record) return this.json({ message: 'User already has a linked person record' }, 400);
             const userChurch: UserChurch = {
-                userId: id,
+                userId: req.query.userId || id,
                 churchId,
                 personId: req.body.personId
             }

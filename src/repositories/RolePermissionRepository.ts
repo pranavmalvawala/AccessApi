@@ -37,14 +37,12 @@ export class RolePermissionRepository {
 
 
     public async loadForUser(userId: string, removeUniversal: boolean): Promise<Church[]> {
-
         const query = "SELECT c.name AS churchName, r.churchId, c.subDomain, rp.apiName, rp.contentType, rp.contentId, rp.action, uc.personId AS personId"
             + " FROM roleMembers rm"
             + " INNER JOIN roles r on r.id=rm.roleId"
             + " INNER JOIN rolePermissions rp on (rp.roleId=r.id or (rp.roleId IS NULL AND rp.churchId=rm.churchId))"
             + " LEFT JOIN churches c on c.id=r.churchId"
-            + " LEFT JOIN userChurches uc on uc.churchId=r.churchId"
-            + " LEFT JOIN userChurches uu on uu.userId=rm.userId"
+            + " LEFT JOIN userChurches uc on uc.churchId=r.churchId AND uc.userId = rm.userId"
             + " WHERE rm.userId=?"
             + " GROUP BY c.name, r.churchId, rp.apiName, rp.contentType, rp.contentId, rp.action"
             + " ORDER BY c.name, r.churchId, rp.apiName, rp.contentType, rp.contentId, rp.action";
