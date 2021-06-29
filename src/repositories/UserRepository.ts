@@ -5,10 +5,10 @@ import { UniqueIdHelper, DateTimeHelper } from "../helpers";
 export class UserRepository {
 
   public save(user: User) {
-    if (UniqueIdHelper.isMissing(user.id)) return this.create(user); else return this.update(user);
+    return user.id ? this.update(user) : this.create(user);
   }
 
-  public async create(user: User) {
+  private async create(user: User) {
     user.id = UniqueIdHelper.shortId();
     const sql = "INSERT INTO users (id, email, password, authGuid, displayName) VALUES (?, ?, ?, ?, ?);";
     const params = [user.id, user.email, user.password, user.authGuid, user.displayName];
@@ -16,7 +16,7 @@ export class UserRepository {
     return user;
   }
 
-  public async update(user: User) {
+  private async update(user: User) {
     const registrationDate = DateTimeHelper.toMysqlDate(user.registrationDate);
     const lastLogin = DateTimeHelper.toMysqlDate(user.lastLogin);
     const sql = "UPDATE users SET email=?, password=?, authGuid=?, displayName=?, registrationDate=?, lastLogin=? WHERE id=?;";

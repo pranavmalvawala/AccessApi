@@ -4,6 +4,5 @@ CREATE TABLE `applications` (
   `id` char(11) NOT NULL,
   `keyName` VARCHAR(45) NULL,
   `name` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

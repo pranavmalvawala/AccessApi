@@ -5,10 +5,10 @@ import { UniqueIdHelper } from "../helpers";
 export class RolePermissionRepository {
 
     public save(rolePermission: RolePermission) {
-        if (UniqueIdHelper.isMissing(rolePermission.id)) return this.create(rolePermission); else return this.update(rolePermission);
+        return rolePermission.id ? this.update(rolePermission) : this.create(rolePermission)
     }
 
-    public async create(rolePermission: RolePermission) {
+    private async create(rolePermission: RolePermission) {
         rolePermission.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, contentId, action) VALUES (?, ?, ?, ?, ?, ?, ?);";
         const params = [rolePermission.id, rolePermission.churchId, rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action];
@@ -16,7 +16,7 @@ export class RolePermissionRepository {
         return rolePermission;
     }
 
-    public async update(rolePermission: RolePermission) {
+    private async update(rolePermission: RolePermission) {
         const sql = "UPDATE rolePermissions SET roleId=?, apiName=?, contentType=?, contentId=?, action=? WHERE id=? AND churchId=?";
         const params = [rolePermission.roleId, rolePermission.apiName, rolePermission.contentType, rolePermission.contentId, rolePermission.action, rolePermission.id, rolePermission.churchId];
         await DB.query(sql, params);

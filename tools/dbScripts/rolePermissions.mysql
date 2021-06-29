@@ -8,6 +8,5 @@ CREATE TABLE `rolePermissions` (
   `contentType` varchar(45) DEFAULT NULL,
   `contentId` char(11) DEFAULT NULL,
   `action` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

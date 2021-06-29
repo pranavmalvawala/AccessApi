@@ -11,6 +11,5 @@ CREATE TABLE `churches` (
   `state` varchar(45) DEFAULT NULL,
   `zip` varchar(45) DEFAULT NULL,
   `country` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

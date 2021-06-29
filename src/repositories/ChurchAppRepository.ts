@@ -21,10 +21,10 @@ export class ChurchAppRepository {
     }
 
     public save(churchApp: ChurchApp) {
-        if (UniqueIdHelper.isMissing(churchApp.id)) return this.create(churchApp); else return this.update(churchApp);
+        return churchApp.id ? this.update(churchApp) : this.create(churchApp);
     }
 
-    public async create(churchApp: ChurchApp) {
+    private async create(churchApp: ChurchApp) {
         churchApp.id = UniqueIdHelper.shortId();
         const sql = "INSERT INTO churchApps (id, churchId, appName, registrationDate) VALUES (?, ?, ?, NOW());";
         const params = [churchApp.id, churchApp.churchId, churchApp.appName];
@@ -32,7 +32,7 @@ export class ChurchAppRepository {
         return churchApp;
     }
 
-    public async update(churchApp: ChurchApp) {
+    private async update(churchApp: ChurchApp) {
         const sql = "UPDATE churchApps SET churchId=?, appName=? WHERE id=?;";
         const params = [churchApp.churchId, churchApp.appName, churchApp.id];
         await DB.query(sql, params)

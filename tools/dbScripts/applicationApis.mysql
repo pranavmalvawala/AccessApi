@@ -4,6 +4,5 @@ CREATE TABLE `applicationApis` (
   `id` char(11) NOT NULL,
   `applicationName` VARCHAR(45) NULL,
   `apiName` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -33,10 +33,10 @@ export class ChurchRepository {
   }
 
   public save(church: Church) {
-    if (UniqueIdHelper.isMissing(church.id)) return this.create(church); else return this.update(church);
+    return church.id ? this.update(church) : this.create(church);
   }
 
-  public async create(church: Church) {
+  private async create(church: Church) {
     church.id = UniqueIdHelper.shortId();
     const sql = "INSERT INTO churches (id, name, subDomain, registrationDate, address1, address2, city, state, zip, country) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?);";
     const params = [church.id, church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country]
@@ -44,7 +44,7 @@ export class ChurchRepository {
     return church;
   }
 
-  public async update(church: Church) {
+  private async update(church: Church) {
     const sql = "UPDATE churches SET name=?, subDomain=?, address1=?, address2=?, city=?, state=?, zip=?, country=? WHERE id=?;";
     const params = [church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country, church.id]
     await DB.query(sql, params);

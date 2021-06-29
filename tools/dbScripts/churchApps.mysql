@@ -5,6 +5,5 @@ CREATE TABLE `churchApps` (
   `churchId` char(11) NULL,
   `appName` VARCHAR(45) NULL,
   `registrationDate` DATETIME DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;

@@ -7,6 +7,5 @@ CREATE TABLE `permissions` (
   `action` VARCHAR(45) NULL,
   `displaySection` VARCHAR(45) NULL,
   `displayAction` VARCHAR(45) NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `id_UNIQUE` (`id`)
+  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
