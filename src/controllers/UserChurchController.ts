@@ -1,4 +1,4 @@
-import { controller, httpGet, httpPost, interfaces } from "inversify-express-utils";
+import { controller, httpGet, httpPost, requestParam } from "inversify-express-utils";
 import express from "express";
 import { AccessBaseController } from "./AccessBaseController";
 import { UserChurch } from "../models";
@@ -19,6 +19,14 @@ export class UserChurchController extends AccessBaseController {
 
             const result = await this.repositories.userChurch.save(userChurch);
             return this.repositories.userChurch.convertToModel(result);
+        })
+    }
+
+    @httpGet("/userid/:userId")
+    public async getByUserId(@requestParam("userId") userId: string, req: express.Request, res: express.Response): Promise<any> {
+        return this.actionWrapper(req, res, async ({churchId}) => {
+            const record = await this.repositories.userChurch.loadByUserId(userId, churchId);
+            return this.repositories.userChurch.convertToModel(record);
         })
     }
 
