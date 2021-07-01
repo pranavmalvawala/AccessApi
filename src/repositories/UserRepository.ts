@@ -26,8 +26,8 @@ export class UserRepository {
   }
 
 
-  public load(id: string): Promise<User> {
-    return DB.queryOne("SELECT * FROM users WHERE id=?", [id]);
+  public load(id: string): Promise<User & { personId?: string }> {
+    return DB.queryOne("SELECT u.*, uc.personId FROM users u LEFT JOIN userchurches uc ON u.id=uc.userId WHERE u.id=?", [id]);
   }
 
   public loadByEmail(email: string): Promise<User> {

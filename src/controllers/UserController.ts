@@ -93,9 +93,17 @@ export class UserController extends AccessBaseController {
   @httpPost("/loadOrCreate")
   public async loadOrCreate(req: express.Request<{}, {}, LoadCreateUserRequest>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      let user = await this.repositories.user.loadByEmail(req.body.userEmail);
-      if (user === null) {
-        user = { email: req.body.userEmail, displayName: req.body.userName };
+      const { userId, userEmail, userName } = req.body;
+      let user: User;
+
+      if (userId) {
+        user = await this.repositories.user.load(userId);
+      } else {
+        user = await this.repositories.user.loadByEmail(userEmail);
+      }
+
+      if (!user) {
+        user = { email: userEmail, displayName: userName };
         user.registrationDate = new Date();
         user.lastLogin = user.registrationDate;
         user.authGuid = v4();
@@ -138,9 +146,9 @@ export class UserController extends AccessBaseController {
 
 
   @httpPost("/setDisplayName")
-  public async setDisplayName(req: express.Request<{}, {}, { displayName: string }>, res: express.Response): Promise<any> {
+  public async setDisplayName(req: express.Request<{}, {}, { displayName: string, userId?: string }>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      let user = await this.repositories.user.load(au.id);
+      let user = await this.repositories.user.load(req.body.userId || au.id);
       if (user !== null) {
         user.displayName = req.body.displayName;
         user = await this.repositories.user.save(user);
@@ -151,9 +159,9 @@ export class UserController extends AccessBaseController {
   }
 
   @httpPost("/updateEmail")
-  public async updateEmail(req: express.Request<{}, {}, { email: string }>, res: express.Response): Promise<any> {
+  public async updateEmail(req: express.Request<{}, {}, { email: string, userId?: string }>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      let user = await this.repositories.user.load(au.id);
+      let user = await this.repositories.user.load(req.body.userId || au.id);
       if (user !== null) {
         const existingUser = await this.repositories.user.loadByEmail(req.body.email);
         if (existingUser === null || existingUser.id === au.id) {
@@ -179,30 +187,6 @@ export class UserController extends AccessBaseController {
       user.password = null;
       return this.json(user, 200);
     });
-  }
-
-  @httpGet("/:id")
-  public async getUser(@requestParam("id") id: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async (au) => {
-      if (!au.checkAccess(Permissions.settings.edit)) return this.json({}, 401);
-      else {
-        const user = await this.repositories.user.load(id);
-        user.password = null;
-        return this.json(user, 200);
-      }
-    })
-  }
-
-  @httpPost("/updateUser")
-  public async updateUser(req: express.Request<{}, {}, User>, res: express.Response): Promise<interfaces.IHttpActionResult> {
-    return this.actionWrapper(req, res, async (au) => {
-      if (!au.checkAccess(Permissions.settings.edit)) return this.json({}, 401);
-      else {
-        const user = await this.repositories.user.save(req.body);
-        user.password = null;
-        return this.json(user, 200);
-      }
-    })
   }
 
   private createLoginLink(id: string) {

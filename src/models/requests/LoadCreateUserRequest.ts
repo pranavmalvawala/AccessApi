@@ -4,4 +4,5 @@ export type LoadCreateUserRequest = {
     userEmail: string;
     subject: string;
     body: string;
+    userId: string;
 };
