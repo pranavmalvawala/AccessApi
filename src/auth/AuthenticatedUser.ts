@@ -13,7 +13,7 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
         else {
             AuthenticatedUser.setJwt(churches, user);
             const result: LoginResponse = {
-                user: { email: user.email, displayName: user.displayName, id: user.id },
+                user: { email: user.email, firstName: user.firstName, lastName: user.lastName, id: user.id },
                 churches
             }
             return result;

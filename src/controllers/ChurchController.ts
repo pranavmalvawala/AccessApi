@@ -256,7 +256,7 @@ export class ChurchController extends AccessBaseController {
         // create user if doesn't exist
         let user = await this.repositories.user.loadByEmail(req.body.email);
         if (user === null) {
-          const newUser: User = { email: req.body.email, displayName: req.body.displayName, password: hashedPass, authGuid: userUUID };
+          const newUser: User = { email: req.body.email, firstName: req.body.firstName, lastName: req.body.lastName, password: hashedPass, authGuid: userUUID };
           user = await this.repositories.user.save(newUser);
         }
 

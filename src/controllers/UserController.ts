@@ -93,7 +93,7 @@ export class UserController extends AccessBaseController {
   @httpPost("/loadOrCreate")
   public async loadOrCreate(req: express.Request<{}, {}, LoadCreateUserRequest>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
-      const { userId, userEmail, userName } = req.body;
+      const { userId, userEmail, firstName, lastName } = req.body;
       let user: User;
 
       if (userId) {
@@ -103,7 +103,7 @@ export class UserController extends AccessBaseController {
       }
 
       if (!user) {
-        user = { email: userEmail, displayName: userName };
+        user = { email: userEmail, firstName, lastName };
         user.registrationDate = new Date();
         user.lastLogin = user.registrationDate;
         user.authGuid = v4();
@@ -146,11 +146,12 @@ export class UserController extends AccessBaseController {
 
 
   @httpPost("/setDisplayName")
-  public async setDisplayName(req: express.Request<{}, {}, { displayName: string, userId?: string }>, res: express.Response): Promise<any> {
+  public async setDisplayName(req: express.Request<{}, {}, { firstName: string, lastName: string, userId?: string }>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       let user = await this.repositories.user.load(req.body.userId || au.id);
       if (user !== null) {
-        user.displayName = req.body.displayName;
+        user.firstName = req.body.firstName;
+        user.lastName = req.body.lastName;
         user = await this.repositories.user.save(user);
       }
       user.password = null;

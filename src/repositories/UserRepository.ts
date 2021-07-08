@@ -10,8 +10,8 @@ export class UserRepository {
 
   private async create(user: User) {
     user.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO users (id, email, password, authGuid, displayName) VALUES (?, ?, ?, ?, ?);";
-    const params = [user.id, user.email, user.password, user.authGuid, user.displayName];
+    const sql = "INSERT INTO users (id, email, password, authGuid, firstName, lastName) VALUES (?, ?, ?, ?, ?, ?);";
+    const params = [user.id, user.email, user.password, user.authGuid, user.firstName, user.lastName];
     await DB.query(sql, params);
     return user;
   }
@@ -19,8 +19,8 @@ export class UserRepository {
   private async update(user: User) {
     const registrationDate = DateTimeHelper.toMysqlDate(user.registrationDate);
     const lastLogin = DateTimeHelper.toMysqlDate(user.lastLogin);
-    const sql = "UPDATE users SET email=?, password=?, authGuid=?, displayName=?, registrationDate=?, lastLogin=? WHERE id=?;";
-    const params = [user.email, user.password, user.authGuid, user.displayName, registrationDate, lastLogin, user.id];
+    const sql = "UPDATE users SET email=?, password=?, authGuid=?, firstName=?, lastName=? registrationDate=?, lastLogin=? WHERE id=?;";
+    const params = [user.email, user.password, user.authGuid, user.firstName, user.lastName, registrationDate, lastLogin, user.id];
     await DB.query(sql, params);
     return user;
   }

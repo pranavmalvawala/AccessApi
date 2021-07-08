@@ -1,6 +1,7 @@
 export type RegistrationRequest = {
   email: string;
-  displayName: string;
+  firstName: string;
+  lastName: string;
   churchName: string;
   subDomain: string
   password: string;
