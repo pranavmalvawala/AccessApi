@@ -19,7 +19,7 @@ export class UserRepository {
   private async update(user: User) {
     const registrationDate = DateTimeHelper.toMysqlDate(user.registrationDate);
     const lastLogin = DateTimeHelper.toMysqlDate(user.lastLogin);
-    const sql = "UPDATE users SET email=?, password=?, authGuid=?, firstName=?, lastName=? registrationDate=?, lastLogin=? WHERE id=?;";
+    const sql = "UPDATE users SET email=?, password=?, authGuid=?, firstName=?, lastName=?, registrationDate=?, lastLogin=? WHERE id=?;";
     const params = [user.email, user.password, user.authGuid, user.firstName, user.lastName, registrationDate, lastLogin, user.id];
     await DB.query(sql, params);
     return user;
