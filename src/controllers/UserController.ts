@@ -1,11 +1,39 @@
 import { controller, httpGet, httpPost, interfaces, requestParam } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
+import { body, check, oneOf, validationResult } from "express-validator";
 import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, Church, EmailPassword, ChurchApp } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, Permissions } from "../helpers";
 import { v4 } from 'uuid';
+
+const emailPasswordValidation = [
+  body("email").isEmail().trim().normalizeEmail().withMessage("enter a valid email address"),
+  body("password").isLength({ min: 6 }).withMessage("must be at least 6 chars long")
+];
+
+const loadOrCreateValidation = [
+  oneOf([
+    [
+      body("userEmail").exists().isEmail().withMessage("enter a valid email address").trim().normalizeEmail(),
+      body('firstName').exists().withMessage("enter first name").not().isEmpty().trim().escape(),
+      body('lastName').exists().withMessage("enter last name").not().isEmpty().trim().escape()
+    ],
+    body("userId").exists().withMessage("enter userId").isString()
+  ])
+]
+
+const setDisplayNameValidation = [
+  body("userId").optional().isString(),
+  body('firstName').exists().withMessage("enter first name").not().isEmpty().trim().escape(),
+  body('lastName').exists().withMessage("enter last name").not().isEmpty().trim().escape()
+]
+
+const updateEmailValidation = [
+  body("userId").optional().isString(),
+  body("email").isEmail().trim().normalizeEmail().withMessage("enter a valid email address")
+]
 
 @controller("/users")
 export class UserController extends AccessBaseController {
@@ -54,9 +82,14 @@ export class UserController extends AccessBaseController {
     return churches.map(c => { c.apps = churchApps[c.id]; return c });
   }
 
-  @httpPost("/verifyCredentials")
+  @httpPost("/verifyCredentials", ...emailPasswordValidation)
   public async verifyCredentials(req: express.Request<{}, {}, EmailPassword>, res: express.Response): Promise<any> {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       const user = await this.repositories.user.loadByEmail(req.body.email);
       if (user === null) {
         return this.json({}, 200);
@@ -90,9 +123,14 @@ export class UserController extends AccessBaseController {
     }
   }
 
-  @httpPost("/loadOrCreate")
+  @httpPost("/loadOrCreate", ...loadOrCreateValidation)
   public async loadOrCreate(req: express.Request<{}, {}, LoadCreateUserRequest>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       const { userId, userEmail, firstName, lastName } = req.body;
       let user: User;
 
@@ -111,8 +149,8 @@ export class UserController extends AccessBaseController {
 
         const loginLink = this.createLoginLink(user.authGuid);
         const subject = "Live Church Solutions One Time Login Link";
-        const body = `Your one time login link: <a href="${loginLink}">${loginLink}</a>`;
-        await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body});
+        const emailBody = `Your one time login link: <a href="${loginLink}">${loginLink}</a>`;
+        await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body: emailBody});
       }
       user.password = null;
       return this.json(user, 200);
@@ -121,20 +159,25 @@ export class UserController extends AccessBaseController {
 
 
 
-  @httpPost("/forgot")
+  @httpPost("/forgot", body("userEmail").exists().trim().normalizeEmail().withMessage("enter a valid email address"))
   public async forgotPassword(req: express.Request<{}, {}, ResetPasswordRequest>, res: express.Response): Promise<any> {
     try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       const user = await this.repositories.user.loadByEmail(req.body.userEmail);
       if (user === null) return this.json({ emailed: false }, 200);
       else {
         user.authGuid = v4();
         const loginLink = this.createLoginLink(user.authGuid);
         const subject = "Live Church Solutions Password Reset"
-        const body = `Please click here to reset your password: <a href="${loginLink}">${loginLink}</a>"`;
+        const emailBody = `Please click here to reset your password: <a href="${loginLink}">${loginLink}</a>"`;
 
         const promises = [];
         promises.push(this.repositories.user.save(user));
-        promises.push(EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body }));
+        promises.push(EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body: emailBody }));
         await Promise.all(promises);
         return this.json({ emailed: true }, 200);
       }
@@ -145,9 +188,14 @@ export class UserController extends AccessBaseController {
   }
 
 
-  @httpPost("/setDisplayName")
+  @httpPost("/setDisplayName", ...setDisplayNameValidation)
   public async setDisplayName(req: express.Request<{}, {}, { firstName: string, lastName: string, userId?: string }>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       let user = await this.repositories.user.load(req.body.userId || au.id);
       if (user !== null) {
         user.firstName = req.body.firstName;
@@ -159,9 +207,14 @@ export class UserController extends AccessBaseController {
     });
   }
 
-  @httpPost("/updateEmail")
+  @httpPost("/updateEmail", ...updateEmailValidation)
   public async updateEmail(req: express.Request<{}, {}, { email: string, userId?: string }>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       let user = await this.repositories.user.load(req.body.userId || au.id);
       if (user !== null) {
         const existingUser = await this.repositories.user.loadByEmail(req.body.email);
@@ -176,9 +229,14 @@ export class UserController extends AccessBaseController {
     });
   }
 
-  @httpPost("/updatePassword")
+  @httpPost("/updatePassword", body("newPassword").isLength({ min: 6 }).withMessage("must be at least 6 chars long"))
   public async updatePassword(req: express.Request<{}, {}, { newPassword: string }>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+      }
+
       let user = await this.repositories.user.load(au.id);
       if (user !== null) {
         const hashedPass = bcrypt.hashSync(req.body.newPassword, 10);

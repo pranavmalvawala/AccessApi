@@ -3,11 +3,21 @@ import { RegistrationRequest, Church, Role, RoleMember, RolePermission, User, Ch
 import express from "express";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
+import { body, validationResult } from "express-validator";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
 import { Utils, Permissions } from "../helpers";
 import { Repositories } from "../repositories";
 import { ArrayHelper, EmailHelper } from "../apiBase";
+
+const churchRegisterValidation = [
+  body("email").isEmail().trim().normalizeEmail().withMessage("enter a valid email address"),
+  body("password").isLength({ min: 6 }).withMessage("must be at least 6 chars long"),
+  body("churchName").notEmpty().withMessage("select a church name"),
+  body("firstName").notEmpty().withMessage("enter first name"),
+  body("lastName").notEmpty().withMessage("enter last name"),
+  body("subDomain").optional().notEmpty().withMessage("select a subdomain")
+]
 
 @controller("/churches")
 export class ChurchController extends AccessBaseController {
@@ -235,9 +245,13 @@ export class ChurchController extends AccessBaseController {
     await Promise.all(promises);
   }
 
-  @httpPost("/register")
+  @httpPost("/register", ...churchRegisterValidation)
   public async register(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<any> {
     try {
+      const validationErrors = validationResult(req);
+      if (!validationErrors.isEmpty()) {
+        return res.status(400).json({ errors: validationErrors.array() });
+      }
 
       const errors = await this.validateRegister(req.body.subDomain, req.body.email);
       if (errors.length > 0) return this.json({ errors }, 401);
