@@ -1,11 +1,11 @@
-import { controller, httpGet, httpPost, interfaces, requestParam } from "inversify-express-utils";
+import { controller, httpPost } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
-import { body, check, oneOf, validationResult } from "express-validator";
+import { body, oneOf, validationResult } from "express-validator";
 import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, Church, EmailPassword, ChurchApp } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
-import { EmailHelper, Permissions } from "../helpers";
+import { EmailHelper, UserHelper, UniqueIdHelper } from "../helpers";
 import { v4 } from 'uuid';
 
 const emailPasswordValidation = [
@@ -127,30 +127,22 @@ export class UserController extends AccessBaseController {
   public async loadOrCreate(req: express.Request<{}, {}, LoadCreateUserRequest>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
-      }
+      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
 
       const { userId, userEmail, firstName, lastName } = req.body;
       let user: User;
 
-      if (userId) {
-        user = await this.repositories.user.load(userId);
-      } else {
-        user = await this.repositories.user.loadByEmail(userEmail);
-      }
+      if (userId) user = await this.repositories.user.load(userId);
+      else user = await this.repositories.user.loadByEmail(userEmail);
 
       if (!user) {
         user = { email: userEmail, firstName, lastName };
         user.registrationDate = new Date();
         user.lastLogin = user.registrationDate;
-        user.authGuid = v4();
+        const tempPassword = UniqueIdHelper.shortId();
+        user.password = bcrypt.hashSync(tempPassword, 10);
         user = await this.repositories.user.save(user);
-
-        const loginLink = this.createLoginLink(user.authGuid);
-        const subject = "Live Church Solutions One Time Login Link";
-        const emailBody = `Your one time login link: <a href="${loginLink}">${loginLink}</a>`;
-        await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body: emailBody});
+        await UserHelper.sendWelcomeEmail(user.email, tempPassword, null, null);
       }
       user.password = null;
       return this.json(user, 200);

@@ -3,6 +3,7 @@ export type RegistrationRequest = {
   firstName: string;
   lastName: string;
   churchName: string;
-  subDomain: string
-  password: string;
+  subDomain: string;
+  appName: string;
+  appUrl: string;
 };

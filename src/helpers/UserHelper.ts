@@ -1,0 +1,16 @@
+import { EmailHelper } from "../apiBase";
+
+export class UserHelper {
+  static async sendWelcomeEmail(email: string, tempPassword: string, appName: string, appUrl: string) {
+    if (!appName) appName = "ChurchApps";
+    if (!appUrl) appUrl = "https://accounts.churchapps.org";
+    await EmailHelper.sendEmail({
+      from: process.env.SUPPORT_EMAIL,
+      to: email,
+      subject: "Welcome to " + appName + ".",
+      body: "Welcome to " + appName + ".  Your temporary password is <b>" + tempPassword + "</b>.  Please visit <a href=\"" + appUrl + "\">" + appUrl + "</a> to login and change your password."
+    });
+  }
+
+}
+

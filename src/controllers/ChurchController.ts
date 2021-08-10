@@ -2,21 +2,18 @@ import { controller, httpPost, httpGet, interfaces, requestParam } from "inversi
 import { RegistrationRequest, Church, Role, RoleMember, RolePermission, User, ChurchApp, Api } from "../models";
 import express from "express";
 import bcrypt from "bcryptjs";
-import { v4 as uuidv4 } from "uuid";
 import { body, validationResult } from "express-validator";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
-import { Utils, Permissions } from "../helpers";
+import { Utils, Permissions, UserHelper } from "../helpers";
 import { Repositories } from "../repositories";
-import { ArrayHelper, EmailHelper } from "../apiBase";
+import { ArrayHelper, EmailHelper, UniqueIdHelper } from "../apiBase";
 
 const churchRegisterValidation = [
-  body("email").isEmail().trim().normalizeEmail().withMessage("enter a valid email address"),
-  body("password").isLength({ min: 6 }).withMessage("must be at least 6 chars long"),
-  body("churchName").notEmpty().withMessage("select a church name"),
-  body("firstName").notEmpty().withMessage("enter first name"),
-  body("lastName").notEmpty().withMessage("enter last name"),
-  body("subDomain").optional().notEmpty().withMessage("select a subdomain")
+  body("email").isEmail().trim().normalizeEmail().withMessage("Enter a valid email address"),
+  body("churchName").notEmpty().withMessage("Select a church name"),
+  body("firstName").notEmpty().withMessage("Enter first name"),
+  body("lastName").notEmpty().withMessage("Enter last name"),
 ]
 
 @controller("/churches")
@@ -186,6 +183,10 @@ export class ChurchController extends AccessBaseController {
       }
     }
 
+    const user = await this.repositories.user.loadByEmail(email);
+    if (user !== null) result.push("There is already a user registered with this email.  Please login to the ChurchApps.org control panel to manage churches and applications.");
+
+
     return result;
   }
 
@@ -256,22 +257,20 @@ export class ChurchController extends AccessBaseController {
       const errors = await this.validateRegister(req.body.subDomain, req.body.email);
       if (errors.length > 0) return this.json({ errors }, 401);
       else {
-
         const churchCount = await this.repositories.church.loadCount();
 
         // create the church
         let church: Church = { name: req.body.churchName, subDomain: req.body.subDomain };
         church = await this.repositories.church.save(church);
 
-        // create or get the user
-        const hashedPass = bcrypt.hashSync(req.body.password, 10);
-        const userUUID = uuidv4();
-
         // create user if doesn't exist
         let user = await this.repositories.user.loadByEmail(req.body.email);
         if (user === null) {
-          const newUser: User = { email: req.body.email, firstName: req.body.firstName, lastName: req.body.lastName, password: hashedPass, authGuid: userUUID };
+          const tempPassword = UniqueIdHelper.shortId();
+          const hashedPass = bcrypt.hashSync(tempPassword, 10);
+          const newUser: User = { email: req.body.email, firstName: req.body.firstName, lastName: req.body.lastName, password: hashedPass };
           user = await this.repositories.user.save(newUser);
+          await UserHelper.sendWelcomeEmail(user.email, tempPassword, req.body.appName, req.body.appUrl);
         }
 
         // Add first user to server admins group
@@ -300,6 +299,8 @@ export class ChurchController extends AccessBaseController {
             body: church.name
           });
         }
+
+
 
         return this.json(result, 200);
       }
