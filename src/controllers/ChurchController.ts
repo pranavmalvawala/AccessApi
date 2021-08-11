@@ -171,7 +171,7 @@ export class ChurchController extends AccessBaseController {
   }
 
 
-  async validateRegister(subDomain: string, email: string) {
+  async validateRegister(subDomain: string, email: string, au: AuthenticatedUser) {
     const result: string[] = [];
 
     // Verify subdomain isn't taken
@@ -184,7 +184,9 @@ export class ChurchController extends AccessBaseController {
     }
 
     const user = await this.repositories.user.loadByEmail(email);
-    if (user !== null) result.push("There is already a user registered with this email.  Please login to the ChurchApps.org control panel to manage churches and applications.");
+    if (user !== null) {
+      if (!au || au.email !== email) result.push("There is already a user registered with this email.  Please login to the ChurchApps.org control panel to manage churches and applications.");
+    }
 
 
     return result;
@@ -248,13 +250,13 @@ export class ChurchController extends AccessBaseController {
 
   @httpPost("/register", ...churchRegisterValidation)
   public async register(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<any> {
-    try {
+    return this.actionWrapper(req, res, async (au) => {
       const validationErrors = validationResult(req);
       if (!validationErrors.isEmpty()) {
         return res.status(400).json({ errors: validationErrors.array() });
       }
 
-      const errors = await this.validateRegister(req.body.subDomain, req.body.email);
+      const errors = await this.validateRegister(req.body.subDomain, req.body.email, au);
       if (errors.length > 0) return this.json({ errors }, 401);
       else {
         const churchCount = await this.repositories.church.loadCount();
@@ -292,22 +294,12 @@ export class ChurchController extends AccessBaseController {
         const result = await AuthenticatedUser.login(churches, user);
 
         if (process.env.EMAIL_ON_REGISTRATION === "true") {
-          await EmailHelper.sendEmail({
-            from: process.env.SUPPORT_EMAIL,
-            to: process.env.SUPPORT_EMAIL,
-            subject: "New Church Registration",
-            body: church.name
-          });
+          await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: process.env.SUPPORT_EMAIL, subject: "New Church Registration", body: church.name });
         }
-
-
 
         return this.json(result, 200);
       }
-    } catch (e) {
-      this.logger.error(e);
-      return this.internalServerError(e);
-    }
+    });
   }
 
   private async appendLogos(churches: Church[]) {
