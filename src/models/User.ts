@@ -7,4 +7,5 @@ export class User {
   public registrationDate?: Date;
   public lastLogin?: Date;
   public password?: string;
+  public jwt?: string;
 }

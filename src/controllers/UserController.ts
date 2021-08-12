@@ -2,7 +2,7 @@ import { controller, httpPost } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
 import { body, oneOf, validationResult } from "express-validator";
-import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, Church, EmailPassword, ChurchApp } from "../models";
+import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, RegisterUserRequest, Church, EmailPassword, ChurchApp, UserChurch } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, UserHelper, UniqueIdHelper } from "../helpers";
@@ -21,6 +21,16 @@ const loadOrCreateValidation = [
       body('lastName').exists().withMessage("enter last name").not().isEmpty().trim().escape()
     ],
     body("userId").exists().withMessage("enter userId").isString()
+  ])
+]
+
+const registerValidation = [
+  oneOf([
+    [
+      body("email").exists().isEmail().withMessage("enter a valid email address").trim().normalizeEmail(),
+      body('firstName').exists().withMessage("enter first name").not().isEmpty().trim().escape(),
+      body('lastName').exists().withMessage("enter last name").not().isEmpty().trim().escape()
+    ],
   ])
 ]
 
@@ -59,6 +69,8 @@ export class UserController extends AccessBaseController {
         }
       }
 
+      console.log("Loaded " + user.email);
+
       if (user === null) return this.denyAccess(["Login failed"]);
       else {
         const churches = await this.getChurches(user.id)
@@ -76,10 +88,13 @@ export class UserController extends AccessBaseController {
     const churches = await this.repositories.rolePermission.loadForUser(id, true)  // Set to true so churches[0] is always a real church.  Not sre why it was false before.  If we need to change this make it a param on the login request
     const churchApps: { [key: string]: ChurchApp[] } = {};
     churches.forEach(c => { churchApps[c.id] = [] });
-    const apps: ChurchApp[] = await this.repositories.churchApp.loadForChurches(Object.keys(churchApps));
-    apps.forEach(c => { churchApps[c.churchId].push(c) });
+    if (churches.length > 0) {
+      const apps: ChurchApp[] = await this.repositories.churchApp.loadForChurches(Object.keys(churchApps));
+      apps.forEach(c => { churchApps[c.churchId].push(c) });
+      churches.map(c => { c.apps = churchApps[c.id]; return c })
+    }
 
-    return churches.map(c => { c.apps = churchApps[c.id]; return c });
+    return churches;
   }
 
   @httpPost("/verifyCredentials", ...emailPasswordValidation)
@@ -143,6 +158,36 @@ export class UserController extends AccessBaseController {
         user.password = bcrypt.hashSync(tempPassword, 10);
         user = await this.repositories.user.save(user);
         await UserHelper.sendWelcomeEmail(user.email, tempPassword, null, null);
+      }
+      user.password = null;
+      return this.json(user, 200);
+    });
+  }
+
+  @httpPost("/register", ...registerValidation)
+  public async register(req: express.Request<{}, {}, RegisterUserRequest>, res: express.Response): Promise<any> {
+    return this.actionWrapperAnon(req, res, async () => {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+      const register: RegisterUserRequest = req.body;
+      let user: User = await this.repositories.user.loadByEmail(register.email);
+
+      if (user) return res.status(400).json({ errors: ["user already exists"] });
+      else {
+        user = { email: register.email, firstName: register.firstName, lastName: register.lastName };
+        user.registrationDate = new Date();
+        user.lastLogin = user.registrationDate;
+        const tempPassword = UniqueIdHelper.shortId();
+        user.password = bcrypt.hashSync(tempPassword, 10);
+        user = await this.repositories.user.save(user);
+        await UserHelper.sendWelcomeEmail(user.email, tempPassword, register.appName, register.appUrl);
+        const userChurch: UserChurch = {
+          userId: user.id,
+          churchId: register.churchId,
+        }
+        await this.repositories.userChurch.save(userChurch);
+
       }
       user.password = null;
       return this.json(user, 200);
