@@ -69,8 +69,6 @@ export class UserController extends AccessBaseController {
         }
       }
 
-      console.log("Loaded " + user.email);
-
       if (user === null) return this.denyAccess(["Login failed"]);
       else {
         const churches = await this.getChurches(user.id)
