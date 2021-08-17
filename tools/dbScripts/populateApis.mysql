@@ -52,3 +52,6 @@ INSERT INTO permissions (id, apiName, section, action, displaySection, displayAc
 
 INSERT INTO apis (id, keyName, name) VALUES ('me1', 'MessagingApi', 'Messaging');
 INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('me2', 'MessagingApi', 'Chat', 'Host', 'StreamingLive', 'Host Chat');
+
+INSERT INTO apis (id, keyName, name) VALUES ('l1', 'LessonsApi', 'Lessons');
+INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('l2', 'LessonsApi', 'Schedules', 'Edit', 'Lessons', 'Edit Schedules');

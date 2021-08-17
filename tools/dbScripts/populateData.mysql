@@ -26,3 +26,6 @@ INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action)
 INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action) SELECT 'rp7', 0, id, 'AccessApi', 'RolePermissions', 'View' FROM roles WHERE name='Server Admins';
 INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action) SELECT 'rp8', 0, id, 'AccessApi', 'Users', 'Edit' FROM roles WHERE name='Server Admins';
 INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action) SELECT 'rp9', 0, id, 'AccessApi', 'Users', 'View' FROM roles WHERE name='Server Admins';
+
+INSERT INTO applications (id, keyName, name) VALUES ('appLessons', 'Lessons', 'Lessons.church');
+INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('appLessons1', 'Lessons', 'LessonsApi');
