@@ -7,6 +7,7 @@ import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, UserHelper, UniqueIdHelper } from "../helpers";
 import { v4 } from 'uuid';
+import { ChurchHelper } from "../helpers";
 
 const emailPasswordValidation = [
   body("email").isEmail().trim().normalizeEmail().withMessage("enter a valid email address"),
@@ -71,7 +72,8 @@ export class UserController extends AccessBaseController {
 
       if (user === null) return this.denyAccess(["Login failed"]);
       else {
-        const churches = await this.getChurches(user.id)
+        const churches = await this.getChurches(user.id);
+        await ChurchHelper.appendLogos(churches)
         const result = await AuthenticatedUser.login(churches, user);
         if (result === null) return this.denyAccess(["No permissions"]);
         else return this.json(result, 200);
