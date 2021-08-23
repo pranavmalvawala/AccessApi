@@ -7,12 +7,10 @@ import { Church } from "../models";
 export class ChurchHelper {
 
   static async appendLogos(churches: Church[]) {
+    if (!churches || churches.length === 0) return;
     const ids = ArrayHelper.getIds(churches, "id");
-    console.log(ids);
     const settings = await BaseRepositories.getCurrent().setting.loadMulipleChurches(["logoLight", "logoDark"], ids);
-    console.log(settings.length);
     settings.forEach((s: any) => {
-      console.log(s);
       const church = ArrayHelper.getOne(churches, "id", s.churchId);
       if (church.settings === undefined) church.settings = [];
       church.settings.push(s);
