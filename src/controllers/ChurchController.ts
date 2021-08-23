@@ -9,11 +9,24 @@ import { Utils, Permissions, UserHelper } from "../helpers";
 import { Repositories } from "../repositories";
 import { ArrayHelper, EmailHelper, UniqueIdHelper } from "../apiBase";
 
-const churchRegisterValidation = [
+
+const toRemoveChurchRegisterValidation = [
   body("email").isEmail().trim().normalizeEmail().withMessage("Enter a valid email address"),
   body("churchName").notEmpty().withMessage("Select a church name"),
   body("firstName").notEmpty().withMessage("Enter first name"),
   body("lastName").notEmpty().withMessage("Enter last name"),
+]
+
+
+const churchRegisterValidation = [
+  body("name").notEmpty().withMessage("Select a church name"),
+  body("subDomain").notEmpty().withMessage("Select a sub domain"),
+  body("address1").notEmpty().withMessage("Enter an address"),
+  body("city").notEmpty().withMessage("Enter a city"),
+  body("state").notEmpty().withMessage("Select a state"),
+  body("zip").notEmpty().withMessage("Enter a zip"),
+  body("country").notEmpty().withMessage("Enter a country"),
+
 ]
 
 @controller("/churches")
@@ -170,33 +183,11 @@ export class ChurchController extends AccessBaseController {
     });
   }
 
-
-  async validateRegister(subDomain: string, email: string, au: AuthenticatedUser) {
-    const result: string[] = [];
-
-    // Verify subdomain isn't taken
-    if (subDomain !== undefined && subDomain !== null && subDomain !== "") {
-      if (/^([a-z0-9]{1,99})$/.test(subDomain) === false) result.push("Please enter only lower case letters and numbers for the subdomain.  Example: firstchurch");
-      else {
-        const church = await this.repositories.church.loadBySubDomain(subDomain);
-        if (church !== null) result.push("Subdomain unavailable");
-      }
-    }
-
-    const user = await this.repositories.user.loadByEmail(email);
-    if (user !== null) {
-      if (!au || au.email !== email) result.push("There is already a user registered with this email.  Please login to the ChurchApps.org control panel to manage churches and applications.");
-    }
-
-
-    return result;
-  }
-
-  private async createDomainAdminsRole(church: Church, user: User) {
+  private async createDomainAdminsRole(church: Church, userId: string) {
     let role: Role = { churchId: church.id, name: "Domain Admins" };
     role = await this.repositories.role.save(role);
 
-    let roleMember: RoleMember = { churchId: church.id, roleId: role.id, userId: user.id, addedBy: user.id }
+    let roleMember: RoleMember = { churchId: church.id, roleId: role.id, userId, addedBy: userId }
     roleMember = await this.repositories.roleMember.save(roleMember);
 
     const permissions = [];
@@ -221,11 +212,11 @@ export class ChurchController extends AccessBaseController {
     await Promise.all(promises);
   }
 
-  private async createAllMembersRole(church: Church, user: User) {
+  private async createAllMembersRole(church: Church, userId: string) {
     let role: Role = { churchId: church.id, name: "All Members" };
     role = await this.repositories.role.save(role);
 
-    let roleMember: RoleMember = { churchId: church.id, roleId: role.id, userId: user.id, addedBy: user.id }
+    let roleMember: RoleMember = { churchId: church.id, roleId: role.id, userId, addedBy: userId }
     roleMember = await this.repositories.roleMember.save(roleMember);
 
     const permissions = [];
@@ -238,7 +229,7 @@ export class ChurchController extends AccessBaseController {
     await Promise.all(promises);
   }
 
-  private async addEveryonePermissions(church: Church, user: User) {
+  private async addEveryonePermissions(church: Church, userId: string) {
     const permissions = [];
     permissions.push(new RolePermission(church.id, null, "MembershipApi", "People", null, "Edit Self"));
     permissions.push(new RolePermission(church.id, null, "AttendanceApi", "Attendance", null, "Checkin"));
@@ -248,37 +239,43 @@ export class ChurchController extends AccessBaseController {
     await Promise.all(promises);
   }
 
-  @httpPost("/register", ...churchRegisterValidation)
-  public async register(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<any> {
+  async validateRegister(church: Church, au: AuthenticatedUser) {
+    const result: string[] = [];
+    // Verify subdomain isn't taken
+    if (church.subDomain) {
+      if (/^([a-z0-9]{1,99})$/.test(church.subDomain) === false) result.push("Please enter only lower case letters and numbers for the subdomain.  Example: firstchurch");
+      else {
+        const c = await this.repositories.church.loadBySubDomain(church.subDomain);
+        if (c !== null) result.push("Subdomain unavailable");
+      }
+    }
+    return result;
+  }
+
+
+  @httpPost("/add", ...churchRegisterValidation)
+  public async addChurch(req: express.Request<{}, {}, Church>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       const validationErrors = validationResult(req);
       if (!validationErrors.isEmpty()) {
         return res.status(400).json({ errors: validationErrors.array() });
       }
 
-      const errors = await this.validateRegister(req.body.subDomain, req.body.email, au);
+      let church: Church = req.body;
+
+      const errors = await this.validateRegister(church, au);
       if (errors.length > 0) return this.json({ errors }, 401);
       else {
         const churchCount = await this.repositories.church.loadCount();
 
         // create the church
-        let church: Church = { name: req.body.churchName, subDomain: req.body.subDomain };
-        church = await this.repositories.church.save(church);
 
-        // create user if doesn't exist
-        let user = await this.repositories.user.loadByEmail(req.body.email);
-        if (user === null) {
-          const tempPassword = UniqueIdHelper.shortId();
-          const hashedPass = bcrypt.hashSync(tempPassword, 10);
-          const newUser: User = { email: req.body.email, firstName: req.body.firstName, lastName: req.body.lastName, password: hashedPass };
-          user = await this.repositories.user.save(newUser);
-          await UserHelper.sendWelcomeEmail(user.email, tempPassword, req.body.appName, req.body.appUrl);
-        }
+        church = await this.repositories.church.save(church);
 
         // Add first user to server admins group
         if (churchCount === 0) {
           this.repositories.role.loadAll().then(roles => {
-            this.repositories.roleMember.save({ churchId: church.id, roleId: roles[0].id, userId: user.id, addedBy: user.id });
+            this.repositories.roleMember.save({ churchId: church.id, roleId: roles[0].id, userId: au.id, addedBy: au.id });
           })
         }
 
@@ -286,21 +283,21 @@ export class ChurchController extends AccessBaseController {
         let churchApp: ChurchApp = { churchId: church.id, appName: "AccessManagement", registrationDate: new Date() };
         churchApp = await this.repositories.churchApp.save(churchApp);
 
-        await this.createDomainAdminsRole(church, user);
-        await this.createAllMembersRole(church, user);
-        await this.addEveryonePermissions(church, user);
+        await this.createDomainAdminsRole(church, au.id);
+        await this.createAllMembersRole(church, au.id);
+        await this.addEveryonePermissions(church, au.id);
 
-        const churches = await this.repositories.rolePermission.loadForUser(user.id, true)
-        const result = await AuthenticatedUser.login(churches, user);
 
         if (process.env.EMAIL_ON_REGISTRATION === "true") {
           await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: process.env.SUPPORT_EMAIL, subject: "New Church Registration", body: church.name });
         }
 
-        return this.json(result, 200);
+        return church;
       }
     });
   }
+
+
 
   private async appendLogos(churches: Church[]) {
     const ids = ArrayHelper.getIds(churches, "id");
@@ -356,4 +353,106 @@ export class ChurchController extends AccessBaseController {
     return result;
   }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  async toRemoveValidateRegister(subDomain: string, email: string, au: AuthenticatedUser) {
+    const result: string[] = [];
+
+    // Verify subdomain isn't taken
+    if (subDomain !== undefined && subDomain !== null && subDomain !== "") {
+      if (/^([a-z0-9]{1,99})$/.test(subDomain) === false) result.push("Please enter only lower case letters and numbers for the subdomain.  Example: firstchurch");
+      else {
+        const church = await this.repositories.church.loadBySubDomain(subDomain);
+        if (church !== null) result.push("Subdomain unavailable");
+      }
+    }
+
+    const user = await this.repositories.user.loadByEmail(email);
+    if (user !== null) {
+      if (!au || au.email !== email) result.push("There is already a user registered with this email.  Please login to the ChurchApps.org control panel to manage churches and applications.");
+    }
+
+
+    return result;
+  }
+
+
+
+  @httpPost("/register", ...toRemoveChurchRegisterValidation)
+  public async toRemoveRegister(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      const validationErrors = validationResult(req);
+      if (!validationErrors.isEmpty()) {
+        return res.status(400).json({ errors: validationErrors.array() });
+      }
+
+      const errors = await this.toRemoveValidateRegister(req.body.subDomain, req.body.email, au);
+      if (errors.length > 0) return this.json({ errors }, 401);
+      else {
+        const churchCount = await this.repositories.church.loadCount();
+
+        // create the church
+        let church: Church = { name: req.body.churchName, subDomain: req.body.subDomain };
+        church = await this.repositories.church.save(church);
+
+        // create user if doesn't exist
+        let user = await this.repositories.user.loadByEmail(req.body.email);
+        if (user === null) {
+          const tempPassword = UniqueIdHelper.shortId();
+          const hashedPass = bcrypt.hashSync(tempPassword, 10);
+          const newUser: User = { email: req.body.email, firstName: req.body.firstName, lastName: req.body.lastName, password: hashedPass };
+          user = await this.repositories.user.save(newUser);
+          await UserHelper.sendWelcomeEmail(user.email, tempPassword, req.body.appName, req.body.appUrl);
+        }
+
+        // Add first user to server admins group
+        if (churchCount === 0) {
+          this.repositories.role.loadAll().then(roles => {
+            this.repositories.roleMember.save({ churchId: church.id, roleId: roles[0].id, userId: user.id, addedBy: user.id });
+          })
+        }
+
+        // Add AccessManagement App
+        let churchApp: ChurchApp = { churchId: church.id, appName: "AccessManagement", registrationDate: new Date() };
+        churchApp = await this.repositories.churchApp.save(churchApp);
+
+        await this.createDomainAdminsRole(church, user.id);
+        await this.createAllMembersRole(church, user.id);
+        await this.addEveryonePermissions(church, user.id);
+
+        const churches = await this.repositories.rolePermission.loadForUser(user.id, true)
+        const result = await AuthenticatedUser.login(churches, user);
+
+        if (process.env.EMAIL_ON_REGISTRATION === "true") {
+          await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: process.env.SUPPORT_EMAIL, subject: "New Church Registration", body: church.name });
+        }
+
+        return this.json(result, 200);
+      }
+    });
+  }
+
+
+
+
 }
+
+
