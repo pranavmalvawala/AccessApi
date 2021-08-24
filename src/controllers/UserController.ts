@@ -2,12 +2,13 @@ import { controller, httpPost } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
 import { body, oneOf, validationResult } from "express-validator";
-import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, RegisterUserRequest, Church, EmailPassword, ChurchApp, UserChurch } from "../models";
+import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, RegisterUserRequest, Church, EmailPassword, ChurchApp, Api } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, UserHelper, UniqueIdHelper } from "../helpers";
 import { v4 } from 'uuid';
 import { ChurchHelper } from "../helpers";
+import { ArrayHelper } from "../apiBase";
 
 const emailPasswordValidation = [
   body("email").isEmail().trim().normalizeEmail().withMessage("enter a valid email address"),
@@ -85,7 +86,17 @@ export class UserController extends AccessBaseController {
   }
 
   private async getChurches(id: string): Promise<Church[]> {
+
+    // Load churches via Roles
     const churches = await this.repositories.rolePermission.loadForUser(id, true)  // Set to true so churches[0] is always a real church.  Not sre why it was false before.  If we need to change this make it a param on the login request
+
+    // Load churches via userChurches relationships
+    const userChurches: Church[] = await this.repositories.church.loadForUser(id);
+    userChurches.forEach(uc => {
+      if (!ArrayHelper.getOne(churches, "id", uc.id)) churches.push(uc);
+    });
+
+
     const churchApps: { [key: string]: ChurchApp[] } = {};
     churches.forEach(c => { churchApps[c.id] = [] });
     if (churches.length > 0) {

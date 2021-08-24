@@ -1,5 +1,5 @@
 import { DB } from "../apiBase/db";
-import { Church } from "../models";
+import { Church, Api } from "../models";
 import { UniqueIdHelper } from "../helpers";
 
 export class ChurchRepository {
@@ -30,6 +30,21 @@ export class ChurchRepository {
 
   public loadById(id: string) {
     return DB.queryOne("SELECT * FROM churches WHERE id=?;", [id]);
+  }
+
+  public async loadForUser(userId: string) {
+    const sql = "select c.*, uc.personId from userChurches uc "
+      + " inner join churches c on c.id=uc.churchId"
+      + " where uc.userId=?";
+    const rows = await DB.query(sql, [userId]);
+    const result: Church[] = [];
+    rows.forEach((row: any) => {
+      const apis: Api[] = [];
+      const addChurch = { id: row.churchId, name: row.churchName, subDomain: row.subDomain, personId: row.personId, apis };
+      result.push(addChurch);
+    });
+    return rows;
+
   }
 
   public save(church: Church) {

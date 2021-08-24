@@ -22,7 +22,7 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
 
   public static getApiJwt(api: Api, user: User, church: Church) {
     const permList: string[] = [];
-    api.permissions.forEach(p => { permList.push(p.contentType + "_" + String(p.contentId).replace('null', '') + "_" + p.action); });
+    api.permissions?.forEach(p => { permList.push(p.contentType + "_" + String(p.contentId).replace('null', '') + "_" + p.action); });
     return jwt.sign({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, churchId: church.id, personId: church.personId, apiName: api.keyName, permissions: permList }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRATION });
   }
 
@@ -36,7 +36,7 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
 
   public static setJwt(allChurches: Church[], user: User) {
     allChurches.forEach(c => {
-      c.apis.forEach(api => { api.jwt = AuthenticatedUser.getApiJwt(api, user, c) });
+      c.apis?.forEach(api => { api.jwt = AuthenticatedUser.getApiJwt(api, user, c) });
       c.jwt = AuthenticatedUser.getChurchJwt(user, c)
     });
   }
