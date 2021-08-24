@@ -1,7 +1,8 @@
 import { controller, httpPost, httpGet, interfaces, requestParam } from "inversify-express-utils";
-import { RegistrationRequest, Church, Role, RoleMember, RolePermission, User, ChurchApp, Api } from "../models";
+import { RegistrationRequest, Church, Role, RoleMember, RolePermission, User, ChurchApp, Api, UserChurch } from "../models";
 import express from "express";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import { body, validationResult } from "express-validator";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
@@ -19,14 +20,14 @@ const toRemoveChurchRegisterValidation = [
 
 
 const churchRegisterValidation = [
-  body("name").notEmpty().withMessage("Select a church name"),
-  body("subDomain").notEmpty().withMessage("Select a sub domain"),
-  body("address1").notEmpty().withMessage("Enter an address"),
-  body("city").notEmpty().withMessage("Enter a city"),
-  body("state").notEmpty().withMessage("Select a state"),
-  body("zip").notEmpty().withMessage("Enter a zip"),
-  body("country").notEmpty().withMessage("Enter a country"),
-
+  body("church.name").notEmpty().withMessage("Select a church name"),
+  body("church.subDomain").notEmpty().withMessage("Select a sub domain"),
+  body("church.address1").notEmpty().withMessage("Enter an address"),
+  body("church.city").notEmpty().withMessage("Enter a city"),
+  body("church.state").notEmpty().withMessage("Select a state"),
+  body("church.zip").notEmpty().withMessage("Enter a zip"),
+  body("church.country").notEmpty().withMessage("Enter a country"),
+  body("encodedPerson").notEmpty().withMessage("Person to link not found")
 ]
 
 @controller("/churches")
@@ -259,14 +260,14 @@ export class ChurchController extends AccessBaseController {
 
 
   @httpPost("/add", ...churchRegisterValidation)
-  public async addChurch(req: express.Request<{}, {}, Church>, res: express.Response): Promise<any> {
+  public async addChurch(req: express.Request<{}, {}, { encodedPerson: string, church: Church }>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       const validationErrors = validationResult(req);
       if (!validationErrors.isEmpty()) {
         return res.status(400).json({ errors: validationErrors.array() });
       }
 
-      let church: Church = req.body;
+      let { church } = req.body;
 
       const errors = await this.validateRegister(church, au);
       if (errors.length > 0) return this.json({ errors }, 401);
@@ -292,6 +293,14 @@ export class ChurchController extends AccessBaseController {
         await this.createAllMembersRole(church, au.id);
         await this.addEveryonePermissions(church, au.id);
 
+        // create userChurch record
+        const decoded: any = jwt.verify(req.body.encodedPerson, process.env.JWT_SECRET_KEY);
+        const userChurch: UserChurch = {
+          userId: au.id,
+          churchId: church.id,
+          personId: decoded.id
+        }
+        await this.repositories.userChurch.save(userChurch)
 
         if (process.env.EMAIL_ON_REGISTRATION === "true") {
           await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: process.env.SUPPORT_EMAIL, subject: "New Church Registration", body: church.name });

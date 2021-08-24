@@ -182,12 +182,6 @@ export class UserController extends AccessBaseController {
         user.password = bcrypt.hashSync(tempPassword, 10);
         user = await this.repositories.user.save(user);
         await UserHelper.sendWelcomeEmail(user.email, tempPassword, register.appName, register.appUrl);
-        const userChurch: UserChurch = {
-          userId: user.id,
-          churchId: register.churchId,
-        }
-        await this.repositories.userChurch.save(userChurch);
-
       }
       user.password = null;
       return this.json(user, 200);
