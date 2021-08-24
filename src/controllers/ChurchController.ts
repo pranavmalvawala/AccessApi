@@ -5,7 +5,7 @@ import bcrypt from "bcryptjs";
 import { body, validationResult } from "express-validator";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
-import { Utils, Permissions, UserHelper } from "../helpers";
+import { Utils, Permissions, UserHelper, ChurchHelper } from "../helpers";
 import { Repositories } from "../repositories";
 import { ArrayHelper, EmailHelper, UniqueIdHelper } from "../apiBase";
 
@@ -52,6 +52,7 @@ export class ChurchController extends AccessBaseController {
         const app = (req.query.app === undefined) ? "" : req.query.app.toString();
         const data = await this.repositories.church.search(req.query.name.toString(), app);
         result = this.repositories.church.convertAllToModel(data);
+        await ChurchHelper.appendLogos(result);
         if (result.length > 0 && this.include(req, "logoSquare")) await this.appendLogos(result);
       }
       return this.json(result, 200);
@@ -81,6 +82,7 @@ export class ChurchController extends AccessBaseController {
     }
   }
 
+
   @httpGet("/:id")
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
@@ -109,6 +111,9 @@ export class ChurchController extends AccessBaseController {
       }
     });
   }
+
+
+
 
   @httpGet("/:id/impersonate")
   public async impersonate(@requestParam("id") id: string, req: express.Request<{}, {}, {}>, res: express.Response): Promise<interfaces.IHttpActionResult> {

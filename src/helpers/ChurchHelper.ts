@@ -1,4 +1,3 @@
-import { EmailHelper } from "../apiBase";
 import { ArrayHelper } from "../apiBase";
 import { Repositories as BaseRepositories } from "../apiBase/repositories";
 import { Church } from "../models";
