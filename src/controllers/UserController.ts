@@ -186,12 +186,22 @@ export class UserController extends AccessBaseController {
 
       if (user) return res.status(400).json({ errors: ["user already exists"] });
       else {
+        const userCount = await this.repositories.user.loadCount();
+
         user = { email: register.email, firstName: register.firstName, lastName: register.lastName };
         user.registrationDate = new Date();
         user.lastLogin = user.registrationDate;
         const tempPassword = UniqueIdHelper.shortId();
         user.password = bcrypt.hashSync(tempPassword, 10);
         user = await this.repositories.user.save(user);
+
+        // Add first user to server admins group
+        if (userCount === 0) {
+          this.repositories.role.loadAll().then(roles => {
+            this.repositories.roleMember.save({ roleId: roles[0].id, userId: user.id, addedBy: user.id });
+          })
+        }
+
         await UserHelper.sendWelcomeEmail(user.email, tempPassword, register.appName, register.appUrl);
       }
       user.password = null;

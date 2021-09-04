@@ -271,18 +271,8 @@ export class ChurchController extends AccessBaseController {
       const errors = await this.validateRegister(church, au);
       if (errors.length > 0) return this.json({ errors }, 401);
       else {
-        const churchCount = await this.repositories.church.loadCount();
-
         // create the church
-
         church = await this.repositories.church.save(church);
-
-        // Add first user to server admins group
-        if (churchCount === 0) {
-          this.repositories.role.loadAll().then(roles => {
-            this.repositories.roleMember.save({ churchId: church.id, roleId: roles[0].id, userId: au.id, addedBy: au.id });
-          })
-        }
 
         // Add AccessManagement App
         let churchApp: ChurchApp = { churchId: church.id, appName: "AccessManagement", registrationDate: new Date() };
@@ -425,8 +415,6 @@ export class ChurchController extends AccessBaseController {
       const errors = await this.toRemoveValidateRegister(req.body.subDomain, req.body.email, au);
       if (errors.length > 0) return this.json({ errors }, 401);
       else {
-        const churchCount = await this.repositories.church.loadCount();
-
         // create the church
         let church: Church = { name: req.body.churchName, subDomain: req.body.subDomain };
         church = await this.repositories.church.save(church);
@@ -439,13 +427,6 @@ export class ChurchController extends AccessBaseController {
           const newUser: User = { email: req.body.email, firstName: req.body.firstName, lastName: req.body.lastName, password: hashedPass };
           user = await this.repositories.user.save(newUser);
           await UserHelper.sendWelcomeEmail(user.email, tempPassword, req.body.appName, req.body.appUrl);
-        }
-
-        // Add first user to server admins group
-        if (churchCount === 0) {
-          this.repositories.role.loadAll().then(roles => {
-            this.repositories.roleMember.save({ churchId: church.id, roleId: roles[0].id, userId: user.id, addedBy: user.id });
-          })
         }
 
         // Add AccessManagement App

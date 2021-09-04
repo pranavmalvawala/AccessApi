@@ -46,4 +46,9 @@ export class UserRepository {
     return DB.query("SELECT * FROM users WHERE id IN (?)", [ids]);
   }
 
+  public async loadCount() {
+    const data = await DB.queryOne("SELECT COUNT(*) as count FROM users", []);
+    return parseInt(data.count, 0);
+  }
+
 }

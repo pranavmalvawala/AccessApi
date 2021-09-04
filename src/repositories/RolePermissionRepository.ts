@@ -66,7 +66,7 @@ export class RolePermissionRepository {
             currentApi.permissions.push(permission);
         });
 
-        if (this.applyUniversal(result) && removeUniversal) result.splice(0, 1);
+        if (result.length > 0 && this.applyUniversal(result) && removeUniversal) result.splice(0, 1);
         return result;
     }
 
@@ -135,7 +135,7 @@ export class RolePermissionRepository {
 
     // Apply site admin priviledges that aren't tied to a specific church.
     private applyUniversal(churches: Church[]) {
-        if (churches.length < 2 || churches[0].id !== "0") return false;
+        if (churches[0].id !== "0") return false;
         for (let i = 1; i < churches.length; i++) {
             churches[i].apis.forEach(api => {
                 churches[0].apis.forEach(universalApi => {
