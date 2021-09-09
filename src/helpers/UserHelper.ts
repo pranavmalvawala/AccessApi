@@ -1,10 +1,10 @@
 import { EmailHelper } from "../apiBase";
 
 export class UserHelper {
-  static async sendWelcomeEmail(email: string, tempPassword: string, appName: string, appUrl: string) {
+  static sendWelcomeEmail(email: string, tempPassword: string, appName: string, appUrl: string): Promise<any> {
     if (!appName) appName = "ChurchApps";
     if (!appUrl) appUrl = "https://accounts.churchapps.org";
-    await EmailHelper.sendEmail({
+    return EmailHelper.sendEmail({
       from: process.env.SUPPORT_EMAIL,
       to: email,
       subject: "Welcome to " + appName + ".",

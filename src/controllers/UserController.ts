@@ -11,14 +11,14 @@ import { ChurchHelper } from "../helpers";
 import { ArrayHelper } from "../apiBase";
 
 const emailPasswordValidation = [
-  body("email").isEmail().trim().normalizeEmail().withMessage("enter a valid email address"),
+  body("email").isEmail().trim().normalizeEmail({ gmail_remove_dots: false }).withMessage("enter a valid email address"),
   body("password").isLength({ min: 6 }).withMessage("must be at least 6 chars long")
 ];
 
 const loadOrCreateValidation = [
   oneOf([
     [
-      body("userEmail").exists().isEmail().withMessage("enter a valid email address").trim().normalizeEmail(),
+      body("userEmail").exists().isEmail().withMessage("enter a valid email address").trim().normalizeEmail({ gmail_remove_dots: false }),
       body('firstName').exists().withMessage("enter first name").not().isEmpty().trim().escape(),
       body('lastName').exists().withMessage("enter last name").not().isEmpty().trim().escape()
     ],
@@ -29,7 +29,7 @@ const loadOrCreateValidation = [
 const registerValidation = [
   oneOf([
     [
-      body("email").exists().isEmail().withMessage("enter a valid email address").trim().normalizeEmail(),
+      body("email").exists().isEmail().withMessage("enter a valid email address").trim().normalizeEmail({ gmail_remove_dots: false }),
       body('firstName').exists().withMessage("enter first name").not().isEmpty().trim().escape(),
       body('lastName').exists().withMessage("enter last name").not().isEmpty().trim().escape()
     ],
@@ -44,7 +44,7 @@ const setDisplayNameValidation = [
 
 const updateEmailValidation = [
   body("userId").optional().isString(),
-  body("email").isEmail().trim().normalizeEmail().withMessage("enter a valid email address")
+  body("email").isEmail().trim().normalizeEmail({ gmail_remove_dots: false }).withMessage("enter a valid email address")
 ]
 
 @controller("/users")
@@ -186,12 +186,17 @@ export class UserController extends AccessBaseController {
 
       if (user) return res.status(400).json({ errors: ["user already exists"] });
       else {
+        const tempPassword = UniqueIdHelper.shortId();
+        try {
+          await UserHelper.sendWelcomeEmail(register.email, tempPassword, register.appName, register.appUrl);
+        } catch (err) {
+          return this.json({ errors: ["Email address does not exist."] })
+        }
         const userCount = await this.repositories.user.loadCount();
 
         user = { email: register.email, firstName: register.firstName, lastName: register.lastName };
         user.registrationDate = new Date();
         user.lastLogin = user.registrationDate;
-        const tempPassword = UniqueIdHelper.shortId();
         user.password = bcrypt.hashSync(tempPassword, 10);
         user = await this.repositories.user.save(user);
 
@@ -202,7 +207,6 @@ export class UserController extends AccessBaseController {
           })
         }
 
-        await UserHelper.sendWelcomeEmail(user.email, tempPassword, register.appName, register.appUrl);
       }
       user.password = null;
       return this.json(user, 200);
@@ -211,7 +215,7 @@ export class UserController extends AccessBaseController {
 
 
 
-  @httpPost("/forgot", body("userEmail").exists().trim().normalizeEmail().withMessage("enter a valid email address"))
+  @httpPost("/forgot", body("userEmail").exists().trim().normalizeEmail({ gmail_remove_dots: false }).withMessage("enter a valid email address"))
   public async forgotPassword(req: express.Request<{}, {}, ResetPasswordRequest>, res: express.Response): Promise<any> {
     try {
       const errors = validationResult(req);

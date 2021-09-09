@@ -12,7 +12,7 @@ import { ArrayHelper, EmailHelper, UniqueIdHelper } from "../apiBase";
 
 
 const toRemoveChurchRegisterValidation = [
-  body("email").isEmail().trim().normalizeEmail().withMessage("Enter a valid email address"),
+  body("email").isEmail().trim().normalizeEmail({ gmail_remove_dots: false }).withMessage("Enter a valid email address"),
   body("churchName").notEmpty().withMessage("Select a church name"),
   body("firstName").notEmpty().withMessage("Enter first name"),
   body("lastName").notEmpty().withMessage("Enter last name"),
