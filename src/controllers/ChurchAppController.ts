@@ -32,37 +32,37 @@ export class ChurchAppController extends AccessBaseController {
 
         return result;
     }
+    // TODO - remove the code once all logic is moved to church registration
+    // @httpPost("/register")
+    // public async register(req: express.Request<{}, {}, { appName: string }>, res: express.Response): Promise<any> {
+    //     return this.actionWrapper(req, res, async (au) => {
+    //         const errors = await this.validateRegister(au.churchId, req.body.appName);
+    //         if (errors.length > 0) return this.denyAccess(errors);
+    //         else {
+    //             let churchApp: ChurchApp = { churchId: au.churchId, appName: req.body.appName }
+    //             churchApp = await this.repositories.churchApp.save(churchApp);
 
-    @httpPost("/register")
-    public async register(req: express.Request<{}, {}, { appName: string }>, res: express.Response): Promise<any> {
-        return this.actionWrapper(req, res, async (au) => {
-            const errors = await this.validateRegister(au.churchId, req.body.appName);
-            if (errors.length > 0) return this.denyAccess(errors);
-            else {
-                let churchApp: ChurchApp = { churchId: au.churchId, appName: req.body.appName }
-                churchApp = await this.repositories.churchApp.save(churchApp);
+    //             let role: Role = { churchId: au.churchId, name: `${Utils.convertToTitleCase(req.body.appName)} Administrators` };
+    //             role = await this.repositories.role.save(role);
 
-                let role: Role = { churchId: au.churchId, name: `${Utils.convertToTitleCase(req.body.appName)} Administrators` };
-                role = await this.repositories.role.save(role);
+    //             let member: RoleMember = { churchId: au.churchId, addedBy: au.churchId, roleId: role.id, userId: au.id };
+    //             member = await this.repositories.roleMember.save(member);
 
-                let member: RoleMember = { churchId: au.churchId, addedBy: au.churchId, roleId: role.id, userId: au.id };
-                member = await this.repositories.roleMember.save(member);
+    //             const permissionPromises: Promise<RolePermission>[] = [];
+    //             const permissions = await this.repositories.permission.loadForApp(req.body.appName);
+    //             permissions.forEach(p => {
+    //                 const rp: RolePermission = { roleId: role.id, churchId: au.churchId, contentType: p.section, action: p.action, apiName: p.apiName };
+    //                 permissionPromises.push(this.repositories.rolePermission.save(rp));
+    //             });
+    //             await Promise.all(permissionPromises);
 
-                const permissionPromises: Promise<RolePermission>[] = [];
-                const permissions = await this.repositories.permission.loadForApp(req.body.appName);
-                permissions.forEach(p => {
-                    const rp: RolePermission = { roleId: role.id, churchId: au.churchId, contentType: p.section, action: p.action, apiName: p.apiName };
-                    permissionPromises.push(this.repositories.rolePermission.save(rp));
-                });
-                await Promise.all(permissionPromises);
-
-                const church = await this.repositories.rolePermission.loadForChurch(au.churchId, null);
-                const user = await this.repositories.user.load(au.id);
-                const resp = await AuthenticatedUser.login([church], user);
-                return resp;
-            }
-        });
-    }
+    //             const church = await this.repositories.rolePermission.loadForChurch(au.churchId, null);
+    //             const user = await this.repositories.user.load(au.id);
+    //             const resp = await AuthenticatedUser.login([church], user);
+    //             return resp;
+    //         }
+    //     });
+    // }
 
 
 }
