@@ -1,7 +1,6 @@
-import { UserRepository, ChurchRepository, PermissionRepository, RoleRepository, RoleMemberRepository, RolePermissionRepository, ChurchAppRepository, ApplicationRepository, UserChurchRepository } from ".";
+import { UserRepository, ChurchRepository, PermissionRepository, RoleRepository, RoleMemberRepository, RolePermissionRepository, ChurchAppRepository, UserChurchRepository } from ".";
 
 export class Repositories {
-  public application: ApplicationRepository;
   public church: ChurchRepository;
   public churchApp: ChurchAppRepository;
   public permission: PermissionRepository;
@@ -13,7 +12,6 @@ export class Repositories {
   private static _current: Repositories = null;
 
   constructor() {
-    this.application = new ApplicationRepository();
     this.church = new ChurchRepository();
     this.churchApp = new ChurchAppRepository();
     this.permission = new PermissionRepository();

@@ -1,4 +1,3 @@
-export { ApplicationRepository } from "./ApplicationRepository";
 export { ChurchRepository } from "./ChurchRepository";
 export { ChurchAppRepository } from "./ChurchAppRepository";
 export { PermissionRepository } from "./PermissionRepository";

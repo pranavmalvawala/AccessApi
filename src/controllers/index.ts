@@ -1,4 +1,3 @@
-export { ApplicationController } from "./ApplicationController";
 export { ChurchController } from "./ChurchController";
 export { ChurchAppController } from "./ChurchAppController";
 export { PermissionController } from "./PermissionController";

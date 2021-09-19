@@ -1,5 +1,4 @@
 export { Api } from "./Api";
-export { Application } from "./Application";
 export { Church } from "./Church";
 export { ChurchApp } from "./ChurchApp";
 export { User } from "./User";

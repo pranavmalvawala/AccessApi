@@ -18,20 +18,20 @@ export class ChurchAppController extends AccessBaseController {
     }
 
 
-    async validateRegister(churchId: string, appName: string) {
-        const result: string[] = [];
-        // Verify access - Need to add a role.
-        if (true) {
-            const app = await this.repositories.application.loadByKeyName(appName);
-            if (app === null) result.push("Invalid app name");
-            else {
-                const churchApp = await this.repositories.churchApp.loadByChurchIdAppName(churchId, appName);
-                if (churchApp !== null) result.push("App already registered");
-            }
-        }
+    // async validateRegister(churchId: string, appName: string) {
+    //     const result: string[] = [];
+    //     // Verify access - Need to add a role.
+    //     if (true) {
+    //         const app = await this.repositories.application.loadByKeyName(appName);
+    //         if (app === null) result.push("Invalid app name");
+    //         else {
+    //             const churchApp = await this.repositories.churchApp.loadByChurchIdAppName(churchId, appName);
+    //             if (churchApp !== null) result.push("App already registered");
+    //         }
+    //     }
 
-        return result;
-    }
+    //     return result;
+    // }
     // TODO - remove the code once all logic is moved to church registration
     // @httpPost("/register")
     // public async register(req: express.Request<{}, {}, { appName: string }>, res: express.Response): Promise<any> {
