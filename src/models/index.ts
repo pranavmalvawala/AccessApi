@@ -1,6 +1,5 @@
 export { Api } from "./Api";
 export { Church } from "./Church";
-export { ChurchApp } from "./ChurchApp";
 export { User } from "./User";
 export { Campus } from "./Campus";
 export { Permission } from "./Permission"

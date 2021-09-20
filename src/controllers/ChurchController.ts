@@ -27,7 +27,7 @@ export class ChurchController extends AccessBaseController {
       if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
       let term: string = req.query.term.toString();
       if (term === null) term = "";
-      const data = await this.repositories.church.search(term, "");
+      const data = await this.repositories.church.search(term);
       const churches = this.repositories.church.convertAllToModel(data);
       return churches;
     });
@@ -39,7 +39,7 @@ export class ChurchController extends AccessBaseController {
       let result: Church[] = []
       if (req.query.name !== undefined) {
         const app = (req.query.app === undefined) ? "" : req.query.app.toString();
-        const data = await this.repositories.church.search(req.query.name.toString(), app);
+        const data = await this.repositories.church.search(req.query.name.toString());
         result = this.repositories.church.convertAllToModel(data);
         await ChurchHelper.appendLogos(result);
         if (result.length > 0 && this.include(req, "logoSquare")) await this.appendLogos(result);

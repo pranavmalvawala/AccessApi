@@ -2,7 +2,7 @@ import { controller, httpPost } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
 import { body, oneOf, validationResult } from "express-validator";
-import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, RegisterUserRequest, Church, EmailPassword, ChurchApp, Api } from "../models";
+import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, RegisterUserRequest, Church, EmailPassword } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, UserHelper, UniqueIdHelper } from "../helpers";
@@ -95,15 +95,6 @@ export class UserController extends AccessBaseController {
     userChurches.forEach(uc => {
       if (!ArrayHelper.getOne(churches, "id", uc.id)) churches.push(uc);
     });
-
-
-    const churchApps: { [key: string]: ChurchApp[] } = {};
-    churches.forEach(c => { churchApps[c.id] = [] });
-    if (churches.length > 0) {
-      const apps: ChurchApp[] = await this.repositories.churchApp.loadForChurches(Object.keys(churchApps));
-      apps.forEach(c => { churchApps[c.churchId].push(c) });
-      churches.map(c => { c.apps = churchApps[c.id]; return c })
-    }
 
     return churches;
   }

@@ -13,13 +13,9 @@ export class ChurchRepository {
     return DB.query("SELECT * FROM churches ORDER BY name", []).then((rows: Church[]) => { return rows; });
   }
 
-  public search(name: string, app: string) {
+  public search(name: string) {
     let query = "SELECT * FROM churches WHERE name like ?";
     const params = ["%" + name.replace(" ", "%") + "%"];
-    if (app !== undefined && app !== "") {
-      query += " AND id in (SELECT churchId from churchApps WHERE appName=?)";
-      params.push(app);
-    }
     query += " ORDER BY name";
     return DB.query(query, params).then((rows: Church[]) => { return rows; });
   }
