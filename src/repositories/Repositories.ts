@@ -1,8 +1,7 @@
-import { UserRepository, ChurchRepository, PermissionRepository, RoleRepository, RoleMemberRepository, RolePermissionRepository, UserChurchRepository } from ".";
+import { UserRepository, ChurchRepository, RoleRepository, RoleMemberRepository, RolePermissionRepository, UserChurchRepository } from ".";
 
 export class Repositories {
   public church: ChurchRepository;
-  public permission: PermissionRepository;
   public role: RoleRepository;
   public roleMember: RoleMemberRepository;
   public rolePermission: RolePermissionRepository;
@@ -12,7 +11,6 @@ export class Repositories {
 
   constructor() {
     this.church = new ChurchRepository();
-    this.permission = new PermissionRepository();
     this.role = new RoleRepository();
     this.roleMember = new RoleMemberRepository();
     this.rolePermission = new RolePermissionRepository();

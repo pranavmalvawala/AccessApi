@@ -1,5 +1,4 @@
 export { ChurchRepository } from "./ChurchRepository";
-export { PermissionRepository } from "./PermissionRepository";
 export { RoleRepository } from "./RoleRepository";
 export { RoleMemberRepository } from "./RoleMemberRepository";
 export { RolePermissionRepository } from "./RolePermissionRepository";

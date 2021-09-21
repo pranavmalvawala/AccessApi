@@ -1,57 +1,8 @@
 INSERT INTO apis (id, keyName, name) VALUES ('a1', 'AccessApi', 'Access Management');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a2' ,'AccessApi', 'Roles', 'Edit', 'Access', 'Edit Roles');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a3','AccessApi', 'Roles', 'View', 'Access', 'View Roles');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a4', 'AccessApi', 'RoleMembers', 'Edit', 'Access', 'Edit Role Members');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a5', 'AccessApi', 'RoleMembers', 'View', 'Access', 'View Role Members');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a6', 'AccessApi', 'RolePermissions', 'Edit', 'Access', 'Edit Role Permissions');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a7', 'AccessApi', 'RolePermissions', 'View', 'Access', 'View Role Permissions');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a8', 'AccessApi', 'Users', 'Edit', 'Access', 'Edit Users');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a9', 'AccessApi', 'Users', 'View', 'Access', 'View Users');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('a10', 'AccessApi', 'Settings', 'Edit', 'Global', 'Edit Church Settings');
-
 INSERT INTO apis (id, keyName, name) VALUES ('s1', 'StreamingLiveApi', 'StreamingLive');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('s3','StreamingLiveApi', 'Links', 'Edit', 'StreamingLive', 'Edit Links');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('s4','StreamingLiveApi', 'Pages', 'Edit', 'StreamingLive', 'Edit Pages');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('s5','StreamingLiveApi', 'Services', 'Edit', 'StreamingLive', 'Edit Services');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('s6','StreamingLiveApi', 'Tabs', 'Edit', 'StreamingLive', 'Edit Tabs');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('s7','StreamingLiveApi', 'Settings', 'Edit', 'StreamingLive', 'Edit Settings');
-
 INSERT INTO apis (id, keyName, name) VALUES ('b1', 'B1Api', 'B1');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b2', 'B1Api', 'Settings', 'Edit', 'B1', 'Edit Settings');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b3', 'B1Api', 'Links', 'Edit', 'B1', 'Edit Links');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('b4', 'B1Api', 'Pages', 'Edit', 'B1', 'Edit Pages');
-
 INSERT INTO apis (id, keyName, name) VALUES ('m1', 'MembershipApi', 'Membership');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m2', 'MembershipApi', 'Forms', 'Edit', 'People', 'Edit Forms');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m3', 'MembershipApi', 'Forms', 'View', 'People', 'View Forms');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m8', 'MembershipApi', 'Households', 'Edit', 'People', 'Edit Households');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m9', 'MembershipApi', 'People', 'Edit', 'People', 'Edit People');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m10', 'MembershipApi', 'Notes', 'Edit', 'People', 'Edit Notes');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m11', 'MembershipApi', 'Notes', 'View', 'People', 'View Notes');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m4', 'MembershipApi', 'Group Members', 'Edit', 'Groups', 'Edit Group Members');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m5', 'MembershipApi', 'Group Members', 'View', 'Groups', 'View Group Members');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m6', 'MembershipApi', 'Groups', 'Edit', 'Groups', 'Edit Groups');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m12', 'MembershipApi', 'People', 'Edit Self', 'People', 'Edit Self');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m13', 'MembershipApi', 'People', 'View', 'People', 'View People');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('m14', 'MembershipApi', 'People', 'View Members', 'People', 'View Members Only');
-
 INSERT INTO apis (id, keyName, name) VALUES ('g1', 'GivingApi', 'Giving');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g2', 'GivingApi', 'Donations', 'Edit', 'Donations', 'Edit Donations');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g3', 'GivingApi', 'Donations', 'View', 'Donations', 'View Donations');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g4', 'GivingApi', 'Donations', 'View Summary', 'Donations', 'View Donation Summaries');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g5', 'GivingApi', 'Settings', 'Edit', 'Donations', 'Edit Settings');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('g6', 'GivingApi', 'Settings', 'View', 'Donations', 'View Settings');
-
 INSERT INTO apis (id, keyName, name) VALUES ('at1', 'AttendanceApi', 'Attendance');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at2', 'AttendanceApi', 'Services', 'Edit', 'Attendance', 'Edit Services');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at3', 'AttendanceApi', 'Attendance', 'Edit', 'Attendance', 'Edit Attendance');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at4', 'AttendanceApi', 'Attendance', 'View', 'Attendance', 'View Attendance');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at5', 'AttendanceApi', 'Attendance', 'View Summary', 'Attendance', 'View Attendance Summary');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at6', 'AttendanceApi', 'Settings', 'Edit', 'Attendance', 'Edit Settings');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('at7', 'AttendanceApi', 'Attendance', 'Checkin', 'Attendance', 'Checkin');
-
 INSERT INTO apis (id, keyName, name) VALUES ('me1', 'MessagingApi', 'Messaging');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('me2', 'MessagingApi', 'Chat', 'Host', 'StreamingLive', 'Host Chat');
-
 INSERT INTO apis (id, keyName, name) VALUES ('l1', 'LessonsApi', 'Lessons');
-INSERT INTO permissions (id, apiName, section, action, displaySection, displayAction) VALUES ('l2', 'LessonsApi', 'Schedules', 'Edit', 'Lessons', 'Edit Schedules');

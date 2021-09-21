@@ -1,36 +1,4 @@
-type ApiName =
-  | "AccessApi"
-  | "StreamingLiveApi"
-  | "B1Api"
-  | "MembershipApi"
-  | "GivingApi"
-  | "AttendanceApi"
-  | "MessagingApi"
-  | "LessonsApi";
-
-type ContentType =
-  | "Roles"
-  | "RoleMembers"
-  | "RolePermissions"
-  | "Users"
-  | "Settings"
-  | "Links"
-  | "Pages"
-  | "Services"
-  | "Tabs"
-  | "Settings"
-  | "Forms"
-  | "Households"
-  | "People"
-  | "Notes"
-  | "Group Members"
-  | "Groups"
-  | "Donations"
-  | "Attendance"
-  | "Chat"
-  | "Schedules";
-
-type Actions = "Edit" | "View" | "Edit Self" | "View Members" | "View Summary" | "Checkin" | "Host";
+import { ApiName, ContentType, Actions } from "../helpers"
 
 export class RolePermission {
   public id?: string;
