@@ -1,17 +1,3 @@
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app2', 'CHUMS', 'ChumsApi');
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app3', 'CHUMS', 'MembershipApi');
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app4', 'CHUMS', 'GivingApi');
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app5', 'CHUMS', 'AttendanceApi');
-
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app7', 'AccessManagement', 'AccessApi');
-
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app9', 'B1', 'B1Api');
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app10', 'B1', 'GivingApi');
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app11', 'B1', 'AttendanceApi');
-
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app13', 'StreamingLive', 'StreamingLiveApi');
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('app14', 'StreamingLive', 'MessagingApi');
-
 INSERT INTO roles (id, churchId, name) VALUES ('r1', 0, 'Server Admins');
 INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action) SELECT 'rp1', 0, id, 'AccessApi', 'Server', 'Admin' FROM roles WHERE name='Server Admins';
 INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action) SELECT 'rp2', 0, id, 'AccessApi', 'Roles', 'Edit' FROM roles WHERE name='Server Admins';
@@ -22,5 +8,3 @@ INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action)
 INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action) SELECT 'rp7', 0, id, 'AccessApi', 'RolePermissions', 'View' FROM roles WHERE name='Server Admins';
 INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action) SELECT 'rp8', 0, id, 'AccessApi', 'Users', 'Edit' FROM roles WHERE name='Server Admins';
 INSERT INTO rolePermissions (id, churchId, roleId, apiName, contentType, action) SELECT 'rp9', 0, id, 'AccessApi', 'Users', 'View' FROM roles WHERE name='Server Admins';
-
-INSERT INTO applicationApis (id, applicationName, apiName) VALUES ('appLessons1', 'Lessons', 'LessonsApi');

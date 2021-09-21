@@ -9,7 +9,6 @@ const init = async () => {
 
   const tables: { title: string, file: string }[] = [
     { title: "APIs", file: "apis.mysql" },
-    { title: "Application APIs", file: "applicationApis.mysql" },
     { title: "Churches", file: "churches.mysql" },
     { title: "Permissions", file: "permissions.mysql" },
     { title: "Role Members", file: "roleMembers.mysql" },
