@@ -1,8 +1,0 @@
-INSERT INTO apis (id, keyName, name) VALUES ('a1', 'AccessApi', 'Access Management');
-INSERT INTO apis (id, keyName, name) VALUES ('s1', 'StreamingLiveApi', 'StreamingLive');
-INSERT INTO apis (id, keyName, name) VALUES ('b1', 'B1Api', 'B1');
-INSERT INTO apis (id, keyName, name) VALUES ('m1', 'MembershipApi', 'Membership');
-INSERT INTO apis (id, keyName, name) VALUES ('g1', 'GivingApi', 'Giving');
-INSERT INTO apis (id, keyName, name) VALUES ('at1', 'AttendanceApi', 'Attendance');
-INSERT INTO apis (id, keyName, name) VALUES ('me1', 'MessagingApi', 'Messaging');
-INSERT INTO apis (id, keyName, name) VALUES ('l1', 'LessonsApi', 'Lessons');
