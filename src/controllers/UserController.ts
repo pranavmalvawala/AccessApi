@@ -180,6 +180,11 @@ export class UserController extends AccessBaseController {
         const tempPassword = UniqueIdHelper.shortId();
         try {
           await UserHelper.sendWelcomeEmail(register.email, tempPassword, register.appName, register.appUrl);
+
+          if (process.env.EMAIL_ON_REGISTRATION === "true") {
+            const emailBody = "Name: " + user.firstName + " " + user.lastName + "<br/>Email: " + user.email + "<br/>App: " + register.appName;
+            await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: process.env.SUPPORT_EMAIL, subject: "New User Registration", body: emailBody });
+          }
         } catch (err) {
           return this.json({ errors: ["Email address does not exist."] })
         }
