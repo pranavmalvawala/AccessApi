@@ -47,15 +47,15 @@ export const permissionsList: IPermission[] = [
   { apiName: "GivingApi", section: "Donations", action: "View", displaySection: "Donations", displayAction: "View Donations" },
   { apiName: "GivingApi", section: "Settings", action: "View", displaySection: "Donations", displayAction: "View Settings" },
   { apiName: "LessonsApi", section: "Schedules", action: "Edit", displaySection: "Lessons", displayAction: "Edit Schedules" },
+  { apiName: "MembershipApi", section: "Forms", action: "Admin", displaySection: "Forms", displayAction: "Form Admin" },
+  { apiName: "MembershipApi", section: "Forms", action: "Create", displaySection: "Forms", displayAction: "Create Forms" },
   { apiName: "MembershipApi", section: "Group Members", action: "Edit", displaySection: "Groups", displayAction: "Edit Group Members" },
   { apiName: "MembershipApi", section: "Groups", action: "Edit", displaySection: "Groups", displayAction: "Edit Groups" },
   { apiName: "MembershipApi", section: "Group Members", action: "View", displaySection: "Groups", displayAction: "View Group Members" },
-  { apiName: "MembershipApi", section: "Forms", action: "Edit", displaySection: "People", displayAction: "Edit Forms" },
   { apiName: "MembershipApi", section: "Households", action: "Edit", displaySection: "People", displayAction: "Edit Households" },
   { apiName: "MembershipApi", section: "Notes", action: "Edit", displaySection: "People", displayAction: "Edit Notes" },
   { apiName: "MembershipApi", section: "People", action: "Edit", displaySection: "People", displayAction:"Edit People" },
   { apiName: "MembershipApi", section: "People", action: "Edit Self", displaySection: "People", displayAction: "Edit Self" },
-  { apiName: "MembershipApi", section: "Forms", action: "View", displaySection: "People", displayAction: "View Forms" },
   { apiName: "MembershipApi", section: "People", action: "View Members", displaySection: "People", displayAction: "View Members Only" },
   { apiName: "MembershipApi", section: "Notes", action: "View", displaySection: "People", displayAction: "View Notes" },
   { apiName: "MembershipApi", section: "People", action: "View", displaySection: "People", displayAction: "View People" },
@@ -94,7 +94,8 @@ export type DisplaySection =
   | "Groups"
   | "Donations"
   | "Attendance"
-  | "Lessons";
+  | "Lessons"
+  | "Forms";
 
 export type ContentType =
   | "Roles"
@@ -118,4 +119,4 @@ export type ContentType =
   | "Chat"
   | "Schedules";
 
-export type Actions = "Edit" | "View" | "Edit Self" | "View Members" | "View Summary" | "Checkin" | "Host";
+export type Actions = "Admin" | "Edit" | "View" | "Edit Self" | "View Members" | "View Summary" | "Checkin" | "Host" | "Create";
