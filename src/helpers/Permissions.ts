@@ -48,7 +48,7 @@ export const permissionsList: IPermission[] = [
   { apiName: "GivingApi", section: "Settings", action: "View", displaySection: "Donations", displayAction: "View Settings" },
   { apiName: "LessonsApi", section: "Schedules", action: "Edit", displaySection: "Lessons", displayAction: "Edit Schedules" },
   { apiName: "MembershipApi", section: "Forms", action: "Admin", displaySection: "Forms", displayAction: "Form Admin" },
-  { apiName: "MembershipApi", section: "Forms", action: "Create", displaySection: "Forms", displayAction: "Create Forms" },
+  { apiName: "MembershipApi", section: "Forms", action: "Edit", displaySection: "Forms", displayAction: "Edit Forms" },
   { apiName: "MembershipApi", section: "Group Members", action: "Edit", displaySection: "Groups", displayAction: "Edit Group Members" },
   { apiName: "MembershipApi", section: "Groups", action: "Edit", displaySection: "Groups", displayAction: "Edit Groups" },
   { apiName: "MembershipApi", section: "Group Members", action: "View", displaySection: "Groups", displayAction: "View Group Members" },
@@ -119,4 +119,4 @@ export type ContentType =
   | "Chat"
   | "Schedules";
 
-export type Actions = "Admin" | "Edit" | "View" | "Edit Self" | "View Members" | "View Summary" | "Checkin" | "Host" | "Create";
+export type Actions = "Admin" | "Edit" | "View" | "Edit Self" | "View Members" | "View Summary" | "Checkin" | "Host";
