@@ -55,7 +55,8 @@ export class RoleHelper {
       { apiName: "AccessApi", contentType: "Settings", action: "Edit" },
       { apiName: "MembershipApi", contentType: "People", action: "View" },
       { apiName: "MembershipApi", contentType: "People", action: "Edit" },
-      { apiName: "MembershipApi", contentType: "Households", action: "Edit" }
+      { apiName: "MembershipApi", contentType: "Households", action: "Edit" },
+      { apiName: "MembershipApi", contentType: "Forms", action: "Admin" }
     ]);
 
     await this.createRoleMember(roleId)
@@ -97,7 +98,6 @@ export class RoleHelper {
       { apiName: "MembershipApi", contentType: "Notes", action: "Edit" },
       { apiName: "MembershipApi", contentType: "People", action: "Edit" },
       { apiName: "MembershipApi", contentType: "People", action: "Edit Self" },
-      { apiName: "MembershipApi", contentType: "Forms", action: "View" },
       { apiName: "MembershipApi", contentType: "People", action: "View Members" },
       { apiName: "MembershipApi", contentType: "Notes", action: "View" },
       { apiName: "MembershipApi", contentType: "People", action: "View" }
