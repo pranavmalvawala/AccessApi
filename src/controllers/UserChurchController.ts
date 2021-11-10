@@ -3,6 +3,7 @@ import express from "express";
 import { AccessBaseController } from "./AccessBaseController";
 import { UserChurch } from "../models";
 import jwt from "jsonwebtoken";
+import { Environment } from "../helpers";
 
 
 @controller("/userchurch")
@@ -11,7 +12,7 @@ export class UserChurchController extends AccessBaseController {
   @httpPost("/claim")
   public async claim(req: express.Request<{}, {}, { encodedPerson: string }, null>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async ({ id, churchId }) => {
-      const decoded: any = jwt.verify(req.body.encodedPerson, process.env.JWT_SECRET_KEY);
+      const decoded: any = jwt.verify(req.body.encodedPerson, Environment.jwtSecret);
       const userChurch: UserChurch = {
         userId: id,
         churchId,

@@ -2,6 +2,7 @@ import { Principal, AuthenticatedUser as BaseAuthenticatedUser } from '../apiBas
 import { Api, Church, LoginResponse, User } from '../models'
 import jwt from "jsonwebtoken";
 import { Repositories } from '../repositories';
+import { Environment } from '../helpers';
 
 export class AuthenticatedUser extends BaseAuthenticatedUser {
 
@@ -23,15 +24,15 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
   public static getApiJwt(api: Api, user: User, church: Church) {
     const permList: string[] = [];
     api.permissions?.forEach(p => { permList.push(p.contentType + "_" + String(p.contentId).replace('null', '') + "_" + p.action); });
-    return jwt.sign({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, churchId: church.id, personId: church.personId, apiName: api.keyName, permissions: permList }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRATION });
+    return jwt.sign({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, churchId: church.id, personId: church.personId, apiName: api.keyName, permissions: permList }, Environment.jwtSecret, { expiresIn: Environment.jwtExpiration });
   }
 
   public static getChurchJwt(user: User, church: Church) {
-    return jwt.sign({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, churchId: church.id, personId: church.personId }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRATION });
+    return jwt.sign({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, churchId: church.id, personId: church.personId }, Environment.jwtSecret, { expiresIn: Environment.jwtExpiration });
   }
 
   public static getUserJwt(user: User) {
-    return jwt.sign({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName }, process.env.JWT_SECRET_KEY, { expiresIn: process.env.JWT_EXPIRATION });
+    return jwt.sign({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName }, Environment.jwtSecret, { expiresIn: Environment.jwtExpiration });
   }
 
   public static setJwt(allChurches: Church[], user: User) {
@@ -44,7 +45,7 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
   public static async loadUserByJwt(token: string, repositories: Repositories) {
     let result: User = null;
     try {
-      const decoded = new Principal(jwt.verify(token, process.env.JWT_SECRET_KEY));
+      const decoded = new Principal(jwt.verify(token, Environment.jwtSecret));
       const userId: string = decoded.details.id;
       result = await repositories.user.load(userId);
     } catch { console.log('No match'); };

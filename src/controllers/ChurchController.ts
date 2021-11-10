@@ -4,7 +4,7 @@ import express from "express";
 import { body, validationResult } from "express-validator";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
-import { Utils, Permissions, ChurchHelper, RoleHelper } from "../helpers";
+import { Utils, Permissions, ChurchHelper, RoleHelper, Environment } from "../helpers";
 import { Repositories } from "../repositories";
 import { ArrayHelper, EmailHelper } from "../apiBase";
 
@@ -204,8 +204,8 @@ export class ChurchController extends AccessBaseController {
         const instance = new RoleHelper(church.id, au.id)
         await instance.init() // Setup roles and permissions
 
-        if (process.env.EMAIL_ON_REGISTRATION === "true") {
-          await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: process.env.SUPPORT_EMAIL, subject: "New Church Registration", body: church.name });
+        if (Environment.emailOnRegistration) {
+          await EmailHelper.sendEmail({ from: Environment.supportEmail, to: Environment.supportEmail, subject: "New Church Registration", body: church.name });
         }
 
         return church;

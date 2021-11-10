@@ -1,10 +1,12 @@
 import dotenv from "dotenv";
 import { Pool } from "../src/apiBase/pool";
+import { Environment } from "../src/helpers/Environment";
 import { DBCreator } from "../src/apiBase/tools/DBCreator"
 
 const init = async () => {
   dotenv.config();
   console.log("Connecting");
+  Environment.init(process.env.APP_ENV);
   Pool.initPool();
 
   const tables: { title: string, file: string }[] = [
@@ -13,7 +15,7 @@ const init = async () => {
     { title: "Role Permissions", file: "rolePermissions.mysql" },
     { title: "Roles", file: "roles.mysql" },
     { title: "Users", file: "users.mysql" },
-    { title: "User Churches", file:"userChurches.mysql" },
+    { title: "User Churches", file: "userChurches.mysql" },
     { title: "Populate Data", file: "populateData.mysql" },
   ];
 

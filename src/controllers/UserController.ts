@@ -5,7 +5,7 @@ import { body, oneOf, validationResult } from "express-validator";
 import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, RegisterUserRequest, Church, EmailPassword } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
-import { EmailHelper, UserHelper, UniqueIdHelper } from "../helpers";
+import { EmailHelper, UserHelper, UniqueIdHelper, Environment } from "../helpers";
 import { v4 } from 'uuid';
 import { ChurchHelper } from "../helpers";
 import { ArrayHelper } from "../apiBase";
@@ -181,9 +181,9 @@ export class UserController extends AccessBaseController {
         try {
           await UserHelper.sendWelcomeEmail(register.email, tempPassword, register.appName, register.appUrl);
 
-          if (process.env.EMAIL_ON_REGISTRATION === "true") {
+          if (Environment.emailOnRegistration) {
             const emailBody = "Name: " + register.firstName + " " + register.lastName + "<br/>Email: " + register.email + "<br/>App: " + register.appName;
-            await EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: process.env.SUPPORT_EMAIL, subject: "New User Registration", body: emailBody });
+            await EmailHelper.sendEmail({ from: Environment.supportEmail, to: Environment.supportEmail, subject: "New User Registration", body: emailBody });
           }
         } catch (err) {
           return this.json({ errors: ["Email address does not exist."] })
@@ -229,7 +229,7 @@ export class UserController extends AccessBaseController {
 
         const promises = [];
         promises.push(this.repositories.user.save(user));
-        promises.push(EmailHelper.sendEmail({ from: process.env.SUPPORT_EMAIL, to: user.email, subject, body: emailBody }));
+        promises.push(EmailHelper.sendEmail({ from: Environment.supportEmail, to: user.email, subject, body: emailBody }));
         await Promise.all(promises);
         return this.json({ emailed: true }, 200);
       }
@@ -301,7 +301,7 @@ export class UserController extends AccessBaseController {
   }
 
   private createLoginLink(id: string) {
-    return process.env.FRONTEND_ACCOUNTS_APP_HOST + `/login?auth=${id}&returnUrl=/profile`;
+    return Environment.accountsAppRoot + `/login?auth=${id}&returnUrl=/profile`;
   }
 
 }

@@ -1,3 +1,4 @@
+import { Environment } from ".";
 import { EmailHelper } from "../apiBase";
 
 export class UserHelper {
@@ -5,7 +6,7 @@ export class UserHelper {
     if (!appName) appName = "ChurchApps";
     if (!appUrl) appUrl = "https://accounts.churchapps.org";
     return EmailHelper.sendEmail({
-      from: process.env.SUPPORT_EMAIL,
+      from: Environment.supportEmail,
       to: email,
       subject: "Welcome to " + appName + ".",
       body: "Welcome to " + appName + ".  Your temporary password is <b>" + tempPassword + "</b>.  Please visit <a href=\"" + appUrl + "\">" + appUrl + "</a> to login and change your password."
