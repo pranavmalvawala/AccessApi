@@ -1,13 +1,10 @@
-# Modify and save this file as ".env"
 API_ENV=dev
 
 # for local connection - mysql://user:password@host:port/dbName
 CONNECTION_STRING=mysql://
-
-# Node.js server configuration
-SERVER_PORT=8082
-ENCRYPTION_KEY=encryptionKey
+ENCRYPTION_KEY=aSecretKeyOfExactly192BitsLength
 JWT_SECRET=this is a test key that is a sentence
+SERVER_PORT=8082
 
 #SMTP_HOST=smtp.gmail.com
 #SMTP_SECURE=true
