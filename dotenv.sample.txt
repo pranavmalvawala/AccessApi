@@ -1,30 +1,13 @@
 # Modify and save this file as ".env"
 API_ENV=dev
-APP_NAME=AccessApi
+
+# for local connection - mysql://user:password@host:port/dbName
+CONNECTION_STRING=mysql://
 
 # Node.js server configuration
 SERVER_PORT=8082
 
-# MySql configuration
-DB_HOST=localhost
-DB_DATABASE=access
-DB_USER=root
-DB_PASSWORD=
-
-JWT_SECRET_KEY=this is a test key that is a sentence
-JWT_EXPIRATION=2 days
-
-# Supports SES/SMTP/DIRECT. In case of no or incorrect value, DIRECT will be used by default
-MAIL_SYSTEM=DIRECT
 #SMTP_HOST=smtp.gmail.com
 #SMTP_SECURE=true
 #SMTP_USER=user@gmail.com
 #SMTP_PASS=yourpassword
-
-SUPPORT_EMAIL=support@churchapps.org
-EMAIL_ON_REGISTRATION=false
-
-
-# Frontend
-FRONTEND_ACCOUNTS_APP_HOST=http://localhost:3401
-CONTENT_ROOT=http://localhost:3402
