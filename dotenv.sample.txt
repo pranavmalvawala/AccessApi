@@ -6,6 +6,8 @@ CONNECTION_STRING=mysql://
 
 # Node.js server configuration
 SERVER_PORT=8082
+ENCRYPTION_KEY=encryptionKey
+JWT_SECRET=this is a test key that is a sentence
 
 #SMTP_HOST=smtp.gmail.com
 #SMTP_SECURE=true

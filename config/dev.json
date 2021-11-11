@@ -5,7 +5,7 @@
   "contentRoot": "http://localhost:3402",
   "emailOnRegistration": false,
   "fileStore": "disc",
-  "mailSystem": "SMTP",
+  "mailSystem": "",
   "s3Bucket": "",
   "supportEmail": "support@churchapps.org"
 }
