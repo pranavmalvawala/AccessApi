@@ -75,28 +75,28 @@ export class ChurchController extends AccessBaseController {
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
       const churchId = id.toString();
-      let hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
-      if (!hasAccess) {
-        const churches = await this.repositories.rolePermission.loadForUser(au.id, true);
-        churches.forEach(c => { if (c.id === churchId) hasAccess = true; });
+      //let hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
+      //if (!hasAccess) {
+      //  const churches = await this.repositories.rolePermission.loadForUser(au.id, true);
+      //  churches.forEach(c => { if (c.id === churchId) hasAccess = true; });
+      //}
+
+      //if (!hasAccess) return this.json({}, 401);
+      //else {
+      const data = await this.repositories.church.loadById(id);
+      const church = this.repositories.church.convertToModel(data);
+
+      // This block could be simplified
+      if (this.include(req, "permissions")) {
+        let universalChurch = null;
+        const churches = await this.repositories.rolePermission.loadForUser(au.id, false);
+        churches.forEach(c => { if (c.id === "") universalChurch = c; });
+        const result = await this.repositories.rolePermission.loadForChurch(id, universalChurch);
+        if (result !== null) church.apis = result.apis;
       }
 
-      if (!hasAccess) return this.json({}, 401);
-      else {
-        const data = await this.repositories.church.loadById(id);
-        const church = this.repositories.church.convertToModel(data);
-
-        // This block could be simplified
-        if (this.include(req, "permissions")) {
-          let universalChurch = null;
-          const churches = await this.repositories.rolePermission.loadForUser(au.id, false);
-          churches.forEach(c => { if (c.id === "") universalChurch = c; });
-          const result = await this.repositories.rolePermission.loadForChurch(id, universalChurch);
-          if (result !== null) church.apis = result.apis;
-        }
-
-        return church;
-      }
+      return church;
+      /}
     });
   }
 
