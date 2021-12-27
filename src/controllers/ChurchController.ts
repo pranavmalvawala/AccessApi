@@ -74,15 +74,15 @@ export class ChurchController extends AccessBaseController {
   @httpGet("/:id")
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapper(req, res, async (au) => {
-      const churchId = id.toString();
-      //let hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
-      //if (!hasAccess) {
+      // const churchId = id.toString();
+      // let hasAccess = au.checkAccess(Permissions.server.admin) || au.churchId === churchId;
+      // if (!hasAccess) {
       //  const churches = await this.repositories.rolePermission.loadForUser(au.id, true);
       //  churches.forEach(c => { if (c.id === churchId) hasAccess = true; });
-      //}
+      // }
 
-      //if (!hasAccess) return this.json({}, 401);
-      //else {
+      // if (!hasAccess) return this.json({}, 401);
+      // else {
       const data = await this.repositories.church.loadById(id);
       const church = this.repositories.church.convertToModel(data);
 
@@ -96,7 +96,7 @@ export class ChurchController extends AccessBaseController {
       }
 
       return church;
-      /}
+      // }
     });
   }
 

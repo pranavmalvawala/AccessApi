@@ -77,7 +77,11 @@ export class UserController extends AccessBaseController {
         await ChurchHelper.appendLogos(churches)
         const result = await AuthenticatedUser.login(churches, user);
         if (result === null) return this.denyAccess(["No permissions"]);
-        else return this.json(result, 200);
+        else {
+          user.lastLogin = new Date();
+          await this.repositories.user.save(user);
+          return this.json(result, 200);
+        }
       }
     } catch (e) {
       this.logger.error(e);
