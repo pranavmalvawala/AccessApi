@@ -57,12 +57,16 @@ export class ChurchController extends AccessBaseController {
       let result = {}
       if (req.query.subDomain !== undefined) {
         const data = await this.repositories.church.loadBySubDomain(req.query.subDomain.toString());
-        const church = this.repositories.church.convertToModel(data);
-        result = { id: church.id, name: church.name, subDomain: church.subDomain };
+        if (data) {
+          const church = this.repositories.church.convertToModel(data);
+          result = { id: church.id, name: church.name, subDomain: church.subDomain };
+        }
       } else if (req.query.id !== undefined) {
         const data = await this.repositories.church.loadById(req.query.id.toString());
-        const church = this.repositories.church.convertToModel(data);
-        result = { id: church.id, name: church.name, subDomain: church.subDomain };
+        if (data) {
+          const church = this.repositories.church.convertToModel(data);
+          result = { id: church.id, name: church.name, subDomain: church.subDomain };
+        }
       }
       return this.json(result, 200);
     } catch (e) {
