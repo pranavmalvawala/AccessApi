@@ -1,10 +1,10 @@
 import { controller, httpPost, httpGet, interfaces, requestParam } from "inversify-express-utils";
-import { RegistrationRequest, Church, RolePermission, Api } from "../models";
+import { RegistrationRequest, Church, RolePermission, Api, RegisterChurchRequest } from "../models";
 import express from "express";
 import { body, validationResult } from "express-validator";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
-import { Utils, Permissions, ChurchHelper, RoleHelper, Environment } from "../helpers";
+import { Utils, Permissions, ChurchHelper, RoleHelper, Environment, HubspotHelper } from "../helpers";
 import { Repositories } from "../repositories";
 import { ArrayHelper, EmailHelper } from "../apiBase";
 
@@ -189,7 +189,7 @@ export class ChurchController extends AccessBaseController {
   }
 
   @httpPost("/add", ...churchRegisterValidation)
-  public async addChurch(req: express.Request<{}, {}, Church>, res: express.Response): Promise<any> {
+  public async addChurch(req: express.Request<{}, {}, RegisterChurchRequest>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
       const validationErrors = validationResult(req);
       if (!validationErrors.isEmpty()) {
@@ -209,9 +209,14 @@ export class ChurchController extends AccessBaseController {
         await instance.init() // Setup roles and permissions
 
         if (Environment.emailOnRegistration) {
-          await EmailHelper.sendEmail({ from: Environment.supportEmail, to: Environment.supportEmail, subject: "New Church Registration", body: church.name });
+          await EmailHelper.sendEmail({ from: Environment.supportEmail, to: Environment.supportEmail, subject: "New Church Registration", body: church.name + "<br/>App: " + (church.appName || "unknown") });
         }
 
+        try {
+          if (Environment.hubspotKey) await HubspotHelper.register(church.name, au.firstName, au.lastName, church.address1, church.city, church.state, church.zip, au.email, church.appName);
+        } catch (ex) {
+          console.log(ex);
+        }
         return church;
       }
     });

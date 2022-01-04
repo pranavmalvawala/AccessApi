@@ -10,6 +10,7 @@ export class Environment extends EnvironmentBase {
   static emailOnRegistration: bool;
   static supportEmail: string;
   static accountsAppRoot: string;
+  static hubspotKey: string;
 
 
   static init(environment: string) {
@@ -30,6 +31,8 @@ export class Environment extends EnvironmentBase {
     this.emailOnRegistration = data.emailOnRegistration;
     this.supportEmail = data.supportEmail;
     this.accountsAppRoot = data.accountsAppRoot;
+    this.hubspotKey = process.env.HUBSPOT_KEY;
+
   }
 
 }
