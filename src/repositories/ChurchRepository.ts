@@ -28,6 +28,10 @@ export class ChurchRepository {
     return DB.queryOne("SELECT * FROM churches WHERE id=?;", [id]);
   }
 
+  public loadByIds(ids: string[]) {
+    return DB.query("SELECT * FROM churches WHERE id IN (?) order by name;", ids);
+  }
+
   public async loadForUser(userId: string) {
     const sql = "select c.*, uc.personId from userChurches uc "
       + " inner join churches c on c.id=uc.churchId"

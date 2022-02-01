@@ -134,6 +134,23 @@ export class ChurchController extends AccessBaseController {
     });
   }
 
+
+  @httpPost("/byIds")
+  public async loadByIds(req: express.Request<{}, {}, string[]>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapperAnon(req, res, async () => {
+      let result: Church[] = []
+      const ids = req.body;
+      if (ids.length > 0) {
+        const data = await this.repositories.church.loadByIds(ids);
+        result = this.repositories.church.convertAllToModel(data);
+      }
+      return result;
+    });
+  }
+
+
+
+
   static async validateSave(church: Church, repositories: Repositories) {
     const result: string[] = [];
     if (Utils.isEmpty(church.name)) result.push("Church name required");
