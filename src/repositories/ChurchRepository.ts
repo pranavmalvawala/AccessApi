@@ -29,7 +29,7 @@ export class ChurchRepository {
   }
 
   public loadByIds(ids: string[]) {
-    return DB.query("SELECT * FROM churches WHERE id IN (?) order by name;", ids);
+    return DB.query("SELECT * FROM churches WHERE id IN (?) order by name;", [ids]);
   }
 
   public async loadForUser(userId: string) {
