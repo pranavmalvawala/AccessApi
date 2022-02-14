@@ -15,7 +15,7 @@ export class HubspotHelper {
       }
 
       const contact: Hubspot.contactsModels.SimplePublicObjectInput = {
-        properties: { firstname: firstName, lastname: lastName, email, company: companyName, address, city, state, zip }
+        properties: { firstname: firstName, lastname: lastName, email, company: companyName, address, city, state, zip, initial_app: initialApp }
       }
 
       const promises: Promise<any>[] = [];
