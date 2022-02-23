@@ -17,6 +17,7 @@ export class ChurchRepository {
     let query = "SELECT * FROM churches WHERE name like ?";
     const params = ["%" + name.replace(" ", "%") + "%"];
     query += " ORDER BY name";
+    query += " LIMIT 50"
     return DB.query(query, params).then((rows: Church[]) => { return rows; });
   }
 
