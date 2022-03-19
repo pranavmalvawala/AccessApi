@@ -5,6 +5,7 @@ CREATE TABLE `userChurches` (
   `userId` char(11) DEFAULT NULL,
   `churchId` char(11) DEFAULT NULL,
   `personId` char(11) DEFAULT NULL,
+  `lastAccessed` datetime DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `userId` (`userId`),
   KEY `churchId` (`churchId`)

@@ -10,9 +10,9 @@ export class UserChurchRepository {
 
     private async create(userChurch: UserChurch) {
         userChurch.id = UniqueIdHelper.shortId();
-        const { id, userId, churchId, personId, lastAccessed } = userChurch;
+        const { id, userId, churchId, personId } = userChurch;
         const sql = `INSERT INTO userChurches (id, userId, churchId, personId, lastAccessed) values (?, ?, ?, ?, NOW())`;
-        const params = [id, userId, churchId, personId, lastAccessed];
+        const params = [id, userId, churchId, personId];
         await DB.query(sql, params);
         return userChurch;
     }
