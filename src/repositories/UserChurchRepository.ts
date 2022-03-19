@@ -10,17 +10,17 @@ export class UserChurchRepository {
 
     private async create(userChurch: UserChurch) {
         userChurch.id = UniqueIdHelper.shortId();
-        const { id, userId, churchId, personId } = userChurch;
-        const sql = "INSERT INTO userChurches (id, userId, churchId, personId) values (?, ?, ?, ?)";
-        const params = [id, userId, churchId, personId];
+        const { id, userId, churchId, personId, lastAccessed } = userChurch;
+        const sql = "INSERT INTO userChurches (id, userId, churchId, personId, lastAccessed) values (?, ?, ?, ?, ?)";
+        const params = [id, userId, churchId, personId, lastAccessed];
         await DB.query(sql, params);
         return userChurch;
     }
 
     private async update(userChurch: UserChurch) {
-        const { id, userId, churchId, personId } = userChurch;
-        const sql = "UPDATE userChurches SET userId=?, churchId=?, personId=? WHERE id=?;";
-        const params = [userId, churchId, personId, id];
+        const { id, userId, churchId, personId, lastAccessed } = userChurch;
+        const sql = "UPDATE userChurches SET userId=?, churchId=?, personId=? lastAccessed=? WHERE id=?;";
+        const params = [userId, churchId, personId, id, lastAccessed];
         await DB.query(sql, params);
         return userChurch;
     }
@@ -31,8 +31,8 @@ export class UserChurchRepository {
         return DB.queryOne(sql, params);
     }
 
-    public convertToModel({ id, userId, churchId, personId }: any) {
-        const result: UserChurch = { id, userId, churchId, personId };
+    public convertToModel({ id, userId, churchId, personId, lastAccessed }: any) {
+        const result: UserChurch = { id, userId, churchId, personId, lastAccessed };
         return result;
     }
 
