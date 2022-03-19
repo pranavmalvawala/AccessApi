@@ -31,11 +31,7 @@ export class UserChurchController extends AccessBaseController {
   public async update(@requestParam("userId") userId: string, req: express.Request, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async () => {
       const {lastAccessed, churchId} = req.body;
-      console.log("REQ BODY", req.body)
       const existing = await this.repositories.userChurch.loadByUserId(userId, churchId);
-      console.log(existing)
-      console.log(lastAccessed)
-      console.log(churchId)
       const updatedUserChrurch: UserChurch  = {
         id: existing.id,
         userId,

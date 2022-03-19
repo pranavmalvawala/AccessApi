@@ -19,7 +19,7 @@ export class UserChurchRepository {
 
     private async update(userChurch: UserChurch) {
         const { id, userId, churchId, personId, lastAccessed } = userChurch;
-        const sql = "UPDATE userChurches SET userId=?, churchId=?, personId=? lastAccessed=? WHERE id=?;";
+        const sql = "UPDATE userChurches SET userId=?, churchId=?, personId=?, lastAccessed=? WHERE id=?;";
         const params = [userId, churchId, personId, DateTimeHelper.toMysqlDate(lastAccessed), id];
         await DB.query(sql, params);
         return userChurch;
