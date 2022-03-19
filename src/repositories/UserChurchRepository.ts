@@ -1,6 +1,6 @@
 import { DB } from '../apiBase/db';
 import { UserChurch } from '../models';
-import { UniqueIdHelper } from '../helpers';
+import { UniqueIdHelper, DateTimeHelper } from '../helpers';
 
 export class UserChurchRepository {
 
@@ -11,7 +11,7 @@ export class UserChurchRepository {
     private async create(userChurch: UserChurch) {
         userChurch.id = UniqueIdHelper.shortId();
         const { id, userId, churchId, personId, lastAccessed } = userChurch;
-        const sql = "INSERT INTO userChurches (id, userId, churchId, personId, lastAccessed) values (?, ?, ?, ?, ?)";
+        const sql = `INSERT INTO userChurches (id, userId, churchId, personId, lastAccessed) values (?, ?, ?, ?, NOW())`;
         const params = [id, userId, churchId, personId, lastAccessed];
         await DB.query(sql, params);
         return userChurch;
@@ -20,7 +20,7 @@ export class UserChurchRepository {
     private async update(userChurch: UserChurch) {
         const { id, userId, churchId, personId, lastAccessed } = userChurch;
         const sql = "UPDATE userChurches SET userId=?, churchId=?, personId=? lastAccessed=? WHERE id=?;";
-        const params = [userId, churchId, personId, id, lastAccessed];
+        const params = [userId, churchId, personId, DateTimeHelper.toMysqlDate(lastAccessed), id];
         await DB.query(sql, params);
         return userChurch;
     }

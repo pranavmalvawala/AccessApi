@@ -1,4 +1,4 @@
-import { controller, httpGet, httpPost, requestParam } from "inversify-express-utils";
+import { controller, httpGet, httpPatch, httpPost, requestParam } from "inversify-express-utils";
 import express from "express";
 import { AccessBaseController } from "./AccessBaseController";
 import { UserChurch } from "../models";
@@ -24,6 +24,31 @@ export class UserChurchController extends AccessBaseController {
         const result = await this.repositories.userChurch.save(userChurch);
         return this.repositories.userChurch.convertToModel(result);
       } else return existing;
+    })
+  }
+
+  @httpPatch("/:userId")
+  public async update(@requestParam("userId") userId: string, req: express.Request, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async () => {
+      const {lastAccessed, churchId} = req.body;
+      console.log("REQ BODY", req.body)
+      const existing = await this.repositories.userChurch.loadByUserId(userId, churchId);
+      console.log(existing)
+      console.log(lastAccessed)
+      console.log(churchId)
+      const updatedUserChrurch: UserChurch  = {
+        id: existing.id,
+        userId,
+        personId: existing.personId,
+        churchId,
+        lastAccessed
+      }
+
+      if (!existing) {
+        return this.json({ message: 'No church found for user' }, 400);
+      }
+      await this.repositories.userChurch.save(updatedUserChrurch);
+      return existing;
     })
   }
 
