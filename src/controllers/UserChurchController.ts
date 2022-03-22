@@ -30,14 +30,14 @@ export class UserChurchController extends AccessBaseController {
   @httpPatch("/:userId")
   public async update(@requestParam("userId") userId: string, req: express.Request, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async () => {
-      const {lastAccessed, churchId} = req.body;
+      const {churchId} = req.body;
       const existing = await this.repositories.userChurch.loadByUserId(userId, churchId);
       const updatedUserChrurch: UserChurch  = {
         id: existing.id,
         userId,
         personId: existing.personId,
         churchId,
-        lastAccessed
+        lastAccessed: new Date()
       }
 
       if (!existing) {
