@@ -23,7 +23,11 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
 
   public static getApiJwt(api: Api, user: User, church: Church) {
     const permList: string[] = [];
-    api.permissions?.forEach(p => { permList.push(p.contentType + "_" + String(p.contentId).replace('null', '') + "_" + p.action); });
+    api.permissions?.forEach(p => {
+      let permString = p.contentType + "_" + String(p.contentId).replace('null', '') + "_" + p.action
+      if (p.apiName) permString = p.apiName + "_" + p.contentType + "_" + String(p.contentId).replace('null', '') + "_" + p.action
+      permList.push(permString);
+    });
     return jwt.sign({ id: user.id, email: user.email, firstName: user.firstName, lastName: user.lastName, churchId: church.id, personId: church.personId, apiName: api.keyName, permissions: permList }, Environment.jwtSecret, { expiresIn: Environment.jwtExpiration });
   }
 
@@ -37,7 +41,10 @@ export class AuthenticatedUser extends BaseAuthenticatedUser {
 
   public static setJwt(allChurches: Church[], user: User) {
     allChurches.forEach(c => {
-      c.apis?.forEach(api => { api.jwt = AuthenticatedUser.getApiJwt(api, user, c) });
+      c.apis?.forEach(api => {
+        api.jwt = AuthenticatedUser.getApiJwt(api, user, c);
+        if (api.keyName === "ReportingApi") api.permissions = []; // We just need the jwt, not the list
+      });
       c.jwt = AuthenticatedUser.getChurchJwt(user, c)
     });
   }
