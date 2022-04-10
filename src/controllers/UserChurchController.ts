@@ -30,9 +30,9 @@ export class UserChurchController extends AccessBaseController {
   @httpPatch("/:userId")
   public async update(@requestParam("userId") userId: string, req: express.Request, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async () => {
-      const {churchId} = req.body;
+      const { churchId, appName } = req.body;
       const existing = await this.repositories.userChurch.loadByUserId(userId, churchId);
-      const updatedUserChrurch: UserChurch  = {
+      const updatedUserChrurch: UserChurch = {
         id: existing.id,
         userId,
         personId: existing.personId,
@@ -44,6 +44,13 @@ export class UserChurchController extends AccessBaseController {
         return this.json({ message: 'No church found for user' }, 400);
       }
       await this.repositories.userChurch.save(updatedUserChrurch);
+
+      await this.repositories.accessLog.create({
+        appName: appName || "",
+        churchId,
+        userId
+      });
+
       return existing;
     })
   }

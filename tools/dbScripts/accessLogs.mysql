@@ -1,0 +1,8 @@
+CREATE TABLE `accessLogs` (
+  `id` char(11) NOT NULL,
+  `userId` char(11) DEFAULT NULL,
+  `churchId` char(11) DEFAULT NULL,
+  `appName` varchar(45) DEFAULT NULL,
+  `loginTime` date DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;

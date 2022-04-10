@@ -1,3 +1,4 @@
+export { AccessLog } from "./AccessLog";
 export { Api } from "./Api";
 export { Church } from "./Church";
 export { User } from "./User";

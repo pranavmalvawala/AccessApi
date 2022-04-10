@@ -11,6 +11,7 @@ const init = async () => {
   Pool.initPool();
 
   const tables: { title: string, file: string }[] = [
+    { title: "AccessLogs", file: "accessLogs.mysql" },
     { title: "Churches", file: "churches.mysql" },
     { title: "Role Members", file: "roleMembers.mysql" },
     { title: "Role Permissions", file: "rolePermissions.mysql" },

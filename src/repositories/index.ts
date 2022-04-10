@@ -1,3 +1,4 @@
+export { AccessLogRepository } from "./AccessLogRepository";
 export { ChurchRepository } from "./ChurchRepository";
 export { RoleRepository } from "./RoleRepository";
 export { RoleMemberRepository } from "./RoleMemberRepository";

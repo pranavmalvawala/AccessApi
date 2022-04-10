@@ -1,6 +1,8 @@
 import { UserRepository, ChurchRepository, RoleRepository, RoleMemberRepository, RolePermissionRepository, UserChurchRepository } from ".";
+import { AccessLogRepository } from "./AccessLogRepository";
 
 export class Repositories {
+  public accessLog: AccessLogRepository;
   public church: ChurchRepository;
   public role: RoleRepository;
   public roleMember: RoleMemberRepository;
@@ -10,6 +12,7 @@ export class Repositories {
   private static _current: Repositories = null;
 
   constructor() {
+    this.accessLog = new AccessLogRepository();
     this.church = new ChurchRepository();
     this.role = new RoleRepository();
     this.roleMember = new RoleMemberRepository();
