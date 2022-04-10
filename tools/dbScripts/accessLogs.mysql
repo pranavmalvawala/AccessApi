@@ -3,6 +3,6 @@ CREATE TABLE `accessLogs` (
   `userId` char(11) DEFAULT NULL,
   `churchId` char(11) DEFAULT NULL,
   `appName` varchar(45) DEFAULT NULL,
-  `loginTime` date DEFAULT NULL,
+  `loginTime` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
