@@ -31,26 +31,20 @@ export class UserChurchController extends AccessBaseController {
   public async update(@requestParam("userId") userId: string, req: express.Request, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async () => {
       const { churchId, appName } = req.body;
+      await this.repositories.accessLog.create({ appName: appName || "", churchId, userId });
       const existing = await this.repositories.userChurch.loadByUserId(userId, churchId);
-      const updatedUserChrurch: UserChurch = {
-        id: existing.id,
-        userId,
-        personId: existing.personId,
-        churchId,
-        lastAccessed: new Date()
-      }
-
       if (!existing) {
         return this.json({ message: 'No church found for user' }, 400);
+      } else {
+        const updatedUserChrurch: UserChurch = {
+          id: existing?.id,
+          userId,
+          personId: existing.personId,
+          churchId,
+          lastAccessed: new Date()
+        }
+        await this.repositories.userChurch.save(updatedUserChrurch);
       }
-      await this.repositories.userChurch.save(updatedUserChrurch);
-
-      await this.repositories.accessLog.create({
-        appName: appName || "",
-        churchId,
-        userId
-      });
-
       return existing;
     })
   }
