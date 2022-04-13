@@ -10,19 +10,20 @@ export class ChurchRepository {
   }
 
   public loadAll() {
-    return DB.query("SELECT * FROM churches ORDER BY name", []).then((rows: Church[]) => { return rows; });
+    return DB.query("SELECT * FROM churches WHERE archivedDate IS NULL ORDER BY name", []).then((rows: Church[]) => { return rows; });
   }
 
-  public search(name: string) {
+  public search(name: string, includeArchived: boolean) {
     let query = "SELECT * FROM churches WHERE name like ?";
     const params = ["%" + name.replace(" ", "%") + "%"];
+    if (!includeArchived) query += "AND archivedDate IS NULL";
     query += " ORDER BY name";
     query += " LIMIT 50"
     return DB.query(query, params).then((rows: Church[]) => { return rows; });
   }
 
   public loadBySubDomain(subDomain: string) {
-    return DB.queryOne("SELECT * FROM churches WHERE subDomain=?;", [subDomain]);
+    return DB.queryOne("SELECT * FROM churches WHERE subDomain=? and archivedDate IS NULL;", [subDomain]);
   }
 
   public loadById(id: string) {
@@ -35,7 +36,7 @@ export class ChurchRepository {
 
   public async loadForUser(userId: string) {
     const sql = "select c.*, uc.personId from userChurches uc "
-      + " inner join churches c on c.id=uc.churchId"
+      + " inner join churches c on c.id=uc.churchId and c.archivedDate IS NULL"
       + " where uc.userId=?";
     const rows = await DB.query(sql, [userId]);
     const result: Church[] = [];
@@ -54,22 +55,22 @@ export class ChurchRepository {
 
   private async create(church: Church) {
     church.id = UniqueIdHelper.shortId();
-    const sql = "INSERT INTO churches (id, name, subDomain, registrationDate, address1, address2, city, state, zip, country) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?);";
-    const params = [church.id, church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country]
+    const sql = "INSERT INTO churches (id, name, subDomain, registrationDate, address1, address2, city, state, zip, country, archivedDate) VALUES (?, ?, ?, NOW(), ?, ?, ?, ?, ?, ?, ?);";
+    const params = [church.id, church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country, church.archivedDate]
     await DB.query(sql, params);
     return church;
   }
 
   private async update(church: Church) {
-    const sql = "UPDATE churches SET name=?, subDomain=?, address1=?, address2=?, city=?, state=?, zip=?, country=? WHERE id=?;";
-    const params = [church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country, church.id]
+    const sql = "UPDATE churches SET name=?, subDomain=?, address1=?, address2=?, city=?, state=?, zip=?, country=?, archivedDate=? WHERE id=?;";
+    const params = [church.name, church.subDomain, church.address1, church.address2, church.city, church.state, church.zip, church.country, church.archivedDate, church.id]
     await DB.query(sql, params);
     return church;
   }
 
 
   public convertToModel(data: any) {
-    const result: Church = { id: data.id, name: data.name, address1: data.address1, address2: data.address2, city: data.city, state: data.state, zip: data.zip, country: data.country, registrationDate: data.registrationDate, subDomain: data.subDomain };
+    const result: Church = { id: data.id, name: data.name, address1: data.address1, address2: data.address2, city: data.city, state: data.state, zip: data.zip, country: data.country, registrationDate: data.registrationDate, subDomain: data.subDomain, archivedDate: data.archivedDate };
     return result;
   }
 

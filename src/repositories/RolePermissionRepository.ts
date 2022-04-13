@@ -36,7 +36,7 @@ export class RolePermissionRepository {
   }
 
   public async loadForUser(userId: string, removeUniversal: boolean): Promise<Church[]> {
-    const query = "SELECT c.name AS churchName, r.churchId, c.subDomain, rp.apiName, rp.contentType, rp.contentId, rp.action, uc.personId AS personId"
+    const query = "SELECT c.name AS churchName, r.churchId, c.subDomain, rp.apiName, rp.contentType, rp.contentId, rp.action, uc.personId AS personId, c.archivedDate"
       + " FROM roleMembers rm"
       + " INNER JOIN roles r on r.id=rm.roleId"
       + " INNER JOIN rolePermissions rp on (rp.roleId=r.id or (rp.roleId IS NULL AND rp.churchId=rm.churchId))"
@@ -53,7 +53,7 @@ export class RolePermissionRepository {
     let reportingApi: Api = null;
     data.forEach((row: any) => {
       if (currentChurch === null || row.churchId !== currentChurch.id) {
-        currentChurch = { id: row.churchId, name: row.churchName, subDomain: row.subDomain, personId: row.personId, apis: [] };
+        currentChurch = { id: row.churchId, name: row.churchName, subDomain: row.subDomain, personId: row.personId, apis: [], archivedDate: row.archivedDate };
         result.push(currentChurch);
         currentApi = null;
         reportingApi = { keyName: "ReportingApi", permissions: [] }
@@ -73,6 +73,11 @@ export class RolePermissionRepository {
     });
 
     if (result.length > 0 && this.applyUniversal(result) && removeUniversal) result.splice(0, 1);
+
+    for (let i = result.length - 1; i >= 0; i--) {
+      if (result[i].archivedDate) result.splice(i, 1);
+    }
+
     return result;
   }
 

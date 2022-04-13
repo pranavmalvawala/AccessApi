@@ -27,7 +27,7 @@ export class ChurchController extends AccessBaseController {
       if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
       let term: string = req.query.term.toString();
       if (term === null) term = "";
-      const data = await this.repositories.church.search(term);
+      const data = await this.repositories.church.search(term, true);
       const churches = this.repositories.church.convertAllToModel(data);
       return churches;
     });
@@ -39,7 +39,7 @@ export class ChurchController extends AccessBaseController {
       let result: Church[] = []
       if (req.query.name !== undefined) {
         const app = (req.query.app === undefined) ? "" : req.query.app.toString();
-        const data = await this.repositories.church.search(req.query.name.toString());
+        const data = await this.repositories.church.search(req.query.name.toString(), false);
         result = this.repositories.church.convertAllToModel(data);
         await ChurchHelper.appendLogos(result);
         if (result.length > 0 && this.include(req, "logoSquare")) await this.appendLogos(result);
@@ -164,6 +164,20 @@ export class ChurchController extends AccessBaseController {
     }
 
     return result;
+  }
+
+  @httpPost("/:id/archive")
+  public async archive(@requestParam("id") id: string, req: express.Request<{}, {}, { archived: boolean }>, res: express.Response): Promise<any> {
+    return this.actionWrapper(req, res, async (au) => {
+      if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
+      else {
+        const church = await this.repositories.church.loadById(id);
+        if (req.body.archived) church.archivedDate = new Date();
+        else church.archivedDate = null;
+        await this.repositories.church.save(church);
+        return this.json(church, 200);
+      }
+    });
   }
 
   @httpPost("/")
