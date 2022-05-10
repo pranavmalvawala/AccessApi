@@ -14,9 +14,10 @@
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
     "tsc": "tsc",
     "build": "npm-run-all clean lint tsc",
-    "dev:start": "npm-run-all build start",
+    "dev:start": "npm-run-all build startDebug",
     "dev": "nodemon --watch src -e ts,ejs --exec npm run dev:start",
     "start": "node .",
+    "startDebug": "node --inspect=0.0.0.0:9229 .",
     "test": "echo \"Error: no test specified\" && exit 1",
     "serverless-local": "serverless invoke local -f api"
   },
