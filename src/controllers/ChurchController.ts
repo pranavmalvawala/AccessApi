@@ -39,7 +39,7 @@ export class ChurchController extends AccessBaseController {
       let result: Church[] = []
       if (req.query.name !== undefined) {
         const app = (req.query.app === undefined) ? "" : req.query.app.toString();
-        const data = await this.repositories.church.search(req.query.name.toString(), false);
+        const data = await this.repositories.church.search(decodeURI(req.query.name.toString()), false);
         result = this.repositories.church.convertAllToModel(data);
         await ChurchHelper.appendLogos(result);
         if (result.length > 0 && this.include(req, "logoSquare")) await this.appendLogos(result);
