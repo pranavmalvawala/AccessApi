@@ -39,7 +39,14 @@ export class ChurchController extends AccessBaseController {
       let result: Church[] = []
       if (req.query.name !== undefined) {
         const app = (req.query.app === undefined) ? "" : req.query.app.toString();
-        const data = await this.repositories.church.search(decodeURI(req.query.name.toString()), false);
+        const data = await this.repositories.church.search(
+          // decode URI encoded character e.g. replace %20 with ' '
+          decodeURIComponent(
+            // decode unicode characters '\uXXXX'
+            JSON.parse('"' + req.query.name.toString()
+              // prepare unicode characters '\uXXXX' for decoding
+              .replace(/%u/g, '\\u') + '"')
+          ), false);
         result = this.repositories.church.convertAllToModel(data);
         await ChurchHelper.appendLogos(result);
         if (result.length > 0 && this.include(req, "logoSquare")) await this.appendLogos(result);
