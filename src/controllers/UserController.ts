@@ -196,7 +196,6 @@ export class UserController extends AccessBaseController {
 
         user = { email: register.email, firstName: register.firstName, lastName: register.lastName };
         user.registrationDate = new Date();
-        user.lastLogin = user.registrationDate;
         user.password = bcrypt.hashSync(tempPassword, 10);
         user = await this.repositories.user.save(user);
 
