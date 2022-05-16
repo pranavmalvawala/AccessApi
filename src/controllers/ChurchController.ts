@@ -33,6 +33,30 @@ export class ChurchController extends AccessBaseController {
     });
   }
 
+  @httpPost("/search")
+  public async searchPost(req: express.Request<{}, {}, { name: string }>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    try {
+      let result: Church[] = []
+      if (req.body.name !== undefined) {
+        const data = await this.repositories.church.search(
+          // decode URI encoded character e.g. replace %20 with ' '
+          decodeURIComponent(
+            // decode unicode characters '\uXXXX'
+            JSON.parse('"' + req.body.name.toString()
+              // prepare unicode characters '\uXXXX' for decoding
+              .replace(/%u/g, '\\u') + '"')
+          ), false);
+        result = this.repositories.church.convertAllToModel(data);
+        await ChurchHelper.appendLogos(result);
+        if (result.length > 0 && this.include(req, "logoSquare")) await this.appendLogos(result);
+      }
+      return this.json(result, 200);
+    } catch (e) {
+      this.logger.error(e);
+      return this.internalServerError(e);
+    }
+  }
+
   @httpGet("/search/")
   public async search(req: express.Request<{}, {}, []>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     try {
