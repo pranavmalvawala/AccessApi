@@ -46,7 +46,17 @@ export class ChurchRepository {
       result.push(addChurch);
     });
     return rows;
+  }
 
+  public async getAbandoned(noMonths:number = 6) {
+    const sql = "SELECT churchId FROM (SELECT churchId, MAX(lastAccessed) lastAccessed FROM userChurches GROUP BY churchId) groupedChurches WHERE lastAccessed <= DATE_SUB(NOW(), INTERVAL " + noMonths + " MONTH);";
+    const rows = await DB.query(sql, []);
+    return rows;
+  }
+
+  public async deleteAbandoned(noMonths:number = 7) {
+    const sql = "DELETE churches FROM churches LEFT JOIN (SELECT churchId, MAX(lastAccessed) lastAccessed FROM userChurches GROUP BY churchId) groupedChurches ON churches.id = groupedChurches.churchId WHERE groupedChurches.lastAccessed <= DATE_SUB(NOW(), INTERVAL " + noMonths + " MONTH);";
+    return await DB.query(sql, []);
   }
 
   public save(church: Church) {
