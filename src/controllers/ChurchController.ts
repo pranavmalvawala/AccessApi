@@ -1,4 +1,4 @@
-import { controller, httpPost, httpGet, interfaces, requestParam } from "inversify-express-utils";
+import { controller, httpPost, httpGet, interfaces, requestParam, httpDelete } from "inversify-express-utils";
 import { RegistrationRequest, Church, RolePermission, Api, RegisterChurchRequest } from "../models";
 import express from "express";
 import { body, validationResult } from "express-validator";
@@ -105,6 +105,18 @@ export class ChurchController extends AccessBaseController {
       return this.internalServerError(e);
     }
   }
+
+  @httpDelete("/deleteAbandoned")
+  public async deleteAbandoned(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+      return this.actionWrapper(req, res, async (au) => {
+          if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
+          else {
+            const churches = await this.repositories.church.deleteAbandoned(7);
+            return this.json(churches, 200);
+          }
+      });
+  }
+
 
   @httpGet("/:id")
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
