@@ -51,17 +51,22 @@ export class UserChurchController extends AccessBaseController {
 
   @httpPost("/")
   public async save(req: express.Request<{}, {}, UserChurch, { userId: string }>, res: express.Response): Promise<any> {
-    return this.actionWrapper(req, res, async ({ id, churchId }) => {
-      const record = await this.repositories.userChurch.loadByUserId(req.query.userId || id, churchId);
-      if (record) return this.json({ message: 'User already has a linked person record' }, 400);
-      const userChurch: UserChurch = {
-        userId: req.query.userId || id,
-        churchId,
-        personId: req.body.personId
+    return this.actionWrapper(req, res, async (au) => {
+      const userId = req.query.userId || au.id;
+      const record = await this.repositories.userChurch.loadByUserId(userId, au.churchId);
+      let result: any = {}
+      if (record) {
+        if (record.userId !== userId) return this.json({ message: 'User already has a linked person record' }, 400);
+      } else {
+        const userChurch: UserChurch = {
+          userId,
+          churchId: au.churchId,
+          personId: req.body.personId
+        }
+        const data = await this.repositories.userChurch.save(userChurch);
+        result = this.repositories.userChurch.convertToModel(data)
       }
-
-      const result = await this.repositories.userChurch.save(userChurch);
-      return this.repositories.userChurch.convertToModel(result);
+      return result;
     })
   }
 

@@ -265,15 +265,16 @@ export class UserController extends AccessBaseController {
   @httpPost("/updateEmail", ...updateEmailValidation)
   public async updateEmail(req: express.Request<{}, {}, { email: string, userId?: string }>, res: express.Response): Promise<any> {
     return this.actionWrapper(req, res, async (au) => {
+      const workingUserId = req.body.userId || au.id;
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
       }
 
-      let user = await this.repositories.user.load(req.body.userId || au.id);
+      let user = await this.repositories.user.load(workingUserId);
       if (user !== null) {
         const existingUser = await this.repositories.user.loadByEmail(req.body.email);
-        if (existingUser === null || existingUser.id === au.id) {
+        if (existingUser === null || existingUser.id === workingUserId) {
           user.email = req.body.email;
           user = await this.repositories.user.save(user);
         } else return this.denyAccess(["Access denied"]);
