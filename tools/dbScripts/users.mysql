@@ -9,5 +9,6 @@ CREATE TABLE `users` (
   `lastName` varchar(45) DEFAULT NULL,
   `registrationDate` datetime DEFAULT CURRENT_TIMESTAMP,
   `lastLogin` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `email_UNIQUE` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;
