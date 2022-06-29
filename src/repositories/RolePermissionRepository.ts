@@ -1,6 +1,7 @@
 import { DB } from "../apiBase/db";
 import { RolePermission, Church, Api } from "../models";
 import { UniqueIdHelper } from "../helpers";
+import { ArrayHelper } from "../apiBase";
 
 export class RolePermissionRepository {
 
@@ -148,10 +149,14 @@ export class RolePermissionRepository {
   private applyUniversal(churches: Church[]) {
     if (churches[0].id !== "0") return false;
     for (let i = 1; i < churches.length; i++) {
-      churches[i].apis.forEach(api => {
-        churches[0].apis.forEach(universalApi => {
-          if (universalApi.keyName === api.keyName) universalApi.permissions.forEach(perm => { api.permissions.push(perm) });
-        });
+      const currentChurch = churches[i];
+
+      churches[0].apis.forEach(universalApi => {
+        const api = ArrayHelper.getOne(currentChurch.apis, "keyName", universalApi.keyName);
+        if (api === null) currentChurch.apis.push(universalApi);
+        else {
+          universalApi.permissions.forEach(perm => { api.permissions.push(perm) });
+        }
       });
     }
     return true;
