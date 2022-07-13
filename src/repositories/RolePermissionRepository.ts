@@ -102,14 +102,23 @@ export class RolePermissionRepository {
       if (currentApi === null || row.apiName !== currentApi.keyName) {
         currentApi = { keyName: row.apiName, permissions: [] };
         result.apis.push(currentApi);
-
         // Apply universal permissions
         if (univeralChurch !== null) univeralChurch.apis.forEach(universalApi => { if (universalApi.keyName === currentApi.keyName) universalApi.permissions.forEach(perm => { currentApi.permissions.push(perm) }); });
+
       }
 
       const permission: RolePermission = { action: row.action, contentId: row.contentId, contentType: row.contentType }
       currentApi.permissions.push(permission);
     });
+    /*
+        univeralChurch.apis.forEach(universalApi => {
+          const api = ArrayHelper.getOne(result.apis, "keyName", universalApi.keyName);
+          if (api === null) result.apis.push(universalApi);
+          else {
+            universalApi.permissions.forEach(perm => { api.permissions.push(perm) });
+          }
+        });
+    */
     return result;
   }
 
