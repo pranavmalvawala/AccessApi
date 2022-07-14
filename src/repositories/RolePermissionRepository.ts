@@ -162,7 +162,7 @@ export class RolePermissionRepository {
 
       churches[0].apis.forEach(universalApi => {
         const api = ArrayHelper.getOne(currentChurch.apis, "keyName", universalApi.keyName);
-        if (api === null) currentChurch.apis.push(universalApi);
+        if (api === null) currentChurch.apis.push({ ...universalApi });
         else {
           universalApi.permissions.forEach(perm => { api.permissions.push(perm) });
         }
