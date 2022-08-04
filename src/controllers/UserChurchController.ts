@@ -23,7 +23,13 @@ export class UserChurchController extends AccessBaseController {
       if (!existing) {
         const result = await this.repositories.userChurch.save(userChurch);
         return this.repositories.userChurch.convertToModel(result);
-      } else return existing;
+      } else {
+        if (existing.personId !== decoded.id) {
+          existing.personId = decoded.id;
+          await this.repositories.userChurch.save(existing);
+        }
+        return existing;
+      }
     })
   }
 
