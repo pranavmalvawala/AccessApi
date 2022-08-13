@@ -12,6 +12,8 @@ export class Church {
   public country?: string;
   public registrationDate?: Date;
   public archivedDate?: Date;
+  public latitude?: number;
+  public longitude?: number;
   public apis?: Api[];
   public jwt?: string;
 }

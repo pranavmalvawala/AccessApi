@@ -12,5 +12,7 @@ CREATE TABLE `churches` (
   `zip` varchar(45) DEFAULT NULL,
   `country` varchar(45) DEFAULT NULL,
   `archivedDate` datetime DEFAULT NULL,
+  `latitude` float DEFAULT NULL,
+  `longitude` float DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_520_ci;

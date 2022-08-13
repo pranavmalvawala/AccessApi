@@ -4,9 +4,10 @@ import express from "express";
 import { body, validationResult } from "express-validator";
 import { AuthenticatedUser } from '../auth';
 import { AccessBaseController } from "./AccessBaseController"
-import { Utils, Permissions, ChurchHelper, RoleHelper, Environment, HubspotHelper } from "../helpers";
+import { Utils, Permissions, ChurchHelper, RoleHelper, Environment, HubspotHelper, GeoHelper } from "../helpers";
 import { Repositories } from "../repositories";
 import { ArrayHelper, EmailHelper } from "../apiBase";
+import NodeGeocoder from "node-geocoder";
 
 const churchRegisterValidation = [
   body("name").notEmpty().withMessage("Select a church name"),
@@ -108,15 +109,37 @@ export class ChurchController extends AccessBaseController {
 
   @httpDelete("/deleteAbandoned")
   public async deleteAbandoned(req: express.Request<{}, {}, null>, res: express.Response): Promise<interfaces.IHttpActionResult> {
-      return this.actionWrapper(req, res, async (au) => {
-          if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
-          else {
-            const churches = await this.repositories.church.deleteAbandoned(7);
-            return this.json(churches, 200);
-          }
-      });
+    return this.actionWrapper(req, res, async (au) => {
+      if (!au.checkAccess(Permissions.server.admin)) return this.json({}, 401);
+      else {
+        const churches = await this.repositories.church.deleteAbandoned(7);
+        return this.json(churches, 200);
+      }
+    });
   }
 
+  @httpGet("/test")
+  public async test(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
+    return this.actionWrapperAnon(req, res, async () => {
+
+      // const church = await this.repositories.church.loadById("2HQxvHkiB3L");
+      // await GeoHelper.updateChurchAddress(church);
+
+      const churches = await this.repositories.church.loadAll();
+      for (const church of churches) {
+        if (church.address1 && !church.latitude) {
+          try {
+            await GeoHelper.updateChurchAddress(church);
+          } catch (ex) {
+            console.log(ex)
+          }
+        }
+      }
+
+
+
+    });
+  }
 
   @httpGet("/:id")
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
