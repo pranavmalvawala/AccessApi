@@ -118,6 +118,7 @@ export class ChurchController extends AccessBaseController {
     });
   }
 
+  /*
   @httpGet("/test")
   public async test(req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
     return this.actionWrapperAnon(req, res, async () => {
@@ -140,6 +141,7 @@ export class ChurchController extends AccessBaseController {
 
     });
   }
+  */
 
   @httpGet("/:id")
   public async get(@requestParam("id") id: string, req: express.Request<{}, {}, RegistrationRequest>, res: express.Response): Promise<interfaces.IHttpActionResult> {
@@ -259,7 +261,13 @@ export class ChurchController extends AccessBaseController {
           else {
             const c: Church = null;
             const p = ChurchController.validateSave(church, this.repositories).then(errors => {
-              if (errors.length === 0) promises.push(this.repositories.church.save(church));
+              if (errors.length === 0) {
+                promises.push(this.repositories.church.save(church).then(async c => {
+                  await GeoHelper.updateChurchAddress(c);
+                  return c;
+                })
+                );
+              }
               else allErrors.push(...errors);
             });
             promises.push(p);
