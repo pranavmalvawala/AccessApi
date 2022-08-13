@@ -262,9 +262,9 @@ export class ChurchController extends AccessBaseController {
             const c: Church = null;
             const p = ChurchController.validateSave(church, this.repositories).then(errors => {
               if (errors.length === 0) {
-                promises.push(this.repositories.church.save(church).then(async c => {
-                  await GeoHelper.updateChurchAddress(c);
-                  return c;
+                promises.push(this.repositories.church.save(church).then(async ch => {
+                  await GeoHelper.updateChurchAddress(ch);
+                  return ch;
                 })
                 );
               }
