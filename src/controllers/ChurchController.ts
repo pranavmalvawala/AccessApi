@@ -314,7 +314,7 @@ export class ChurchController extends AccessBaseController {
         await instance.init() // Setup roles and permissions
 
         if (Environment.emailOnRegistration) {
-          await EmailHelper.sendEmail({ from: Environment.supportEmail, to: Environment.supportEmail, subject: "New Church Registration", body: church.name + "<br/>App: " + (church.appName || "unknown") });
+          await EmailHelper.sendTemplatedEmail(Environment.supportEmail, Environment.supportEmail, church.appName, null, "New Church Registration", "<h2>" + church.name + "</h2><h3>App: " + (church.appName || "unknown") + "</h3>");
         }
 
         try {

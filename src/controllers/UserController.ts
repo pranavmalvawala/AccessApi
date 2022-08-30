@@ -1,4 +1,4 @@
-import { controller, httpPost } from "inversify-express-utils";
+import { controller, httpGet, httpPost } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
 import { body, oneOf, validationResult } from "express-validator";
@@ -8,7 +8,7 @@ import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, UserHelper, UniqueIdHelper, Environment } from "../helpers";
 import { v4 } from 'uuid';
 import { ChurchHelper } from "../helpers";
-import { ArrayHelper } from "../apiBase";
+import { ArrayHelper } from "../apiBase"
 
 const emailPasswordValidation = [
   body("email").isEmail().trim().normalizeEmail({ gmail_remove_dots: false }).withMessage("enter a valid email address"),
@@ -49,7 +49,6 @@ const updateEmailValidation = [
 
 @controller("/users")
 export class UserController extends AccessBaseController {
-
 
   @httpPost("/login")
   public async login(req: express.Request<{}, {}, LoginRequest>, res: express.Response): Promise<any> {
@@ -187,7 +186,7 @@ export class UserController extends AccessBaseController {
 
           if (Environment.emailOnRegistration) {
             const emailBody = "Name: " + register.firstName + " " + register.lastName + "<br/>Email: " + register.email + "<br/>App: " + register.appName;
-            await EmailHelper.sendEmail({ from: Environment.supportEmail, to: Environment.supportEmail, subject: "New User Registration", body: emailBody });
+            await EmailHelper.sendTemplatedEmail(Environment.supportEmail, Environment.supportEmail, register.appName, register.appUrl, "New User Registration", emailBody);
           }
         } catch (err) {
           return this.json({ errors: ["Email address does not exist."] })
@@ -228,11 +227,13 @@ export class UserController extends AccessBaseController {
         user.authGuid = v4();
         const loginLink = this.createLoginLink(user.authGuid);
         const subject = "Live Church Solutions Password Reset"
-        const emailBody = `Please click here to reset your password: <a href="${loginLink}">${loginLink}</a>"`;
+        const contents = "<h2>Reset Password</h2>"
+          + "<h3>Please click the button below to reset your password.</h3>"
+          + `<p><a href="${loginLink}" class="btn btn-primary">Reset Password</a></p>`;
 
         const promises = [];
         promises.push(this.repositories.user.save(user));
-        promises.push(EmailHelper.sendEmail({ from: Environment.supportEmail, to: user.email, subject, body: emailBody }));
+        promises.push(EmailHelper.sendTemplatedEmail(Environment.supportEmail, user.email, null, null, subject, contents));
         await Promise.all(promises);
         return this.json({ emailed: true }, 200);
       }
