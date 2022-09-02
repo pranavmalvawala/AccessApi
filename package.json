@@ -8,7 +8,7 @@
     "copy-assets": "copyfiles -f src/apiBase/tools/templates/* dist/templates",
     "exec-deploy-staging": "serverless deploy --stage Staging",
     "deploy-staging": "npm-run-all build copy-assets exec-deploy-staging",
-    "exec-deploy-prod": "serverless deploy copy-assets --stage Prod",
+    "exec-deploy-prod": "serverless deploy --stage Prod",
     "deploy-prod": "npm-run-all build exec-deploy-prod",
     "initdb": "ts-node tools/initdb",
     "lint": "tslint -c tslint.json -p tsconfig.json --fix",
