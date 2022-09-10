@@ -64,7 +64,7 @@ export class UserController extends AccessBaseController {
           await this.repositories.user.save(user);
         }
       } else {
-        user = await this.repositories.user.loadByEmail(req.body.email);
+        user = await this.repositories.user.loadByEmail(req.body.email.trim());
         if (user !== null) {
           if (!bcrypt.compareSync(req.body.password, user.password?.toString() || "")) user = null;
         }
@@ -189,7 +189,8 @@ export class UserController extends AccessBaseController {
             await EmailHelper.sendTemplatedEmail(Environment.supportEmail, Environment.supportEmail, register.appName, register.appUrl, "New User Registration", emailBody);
           }
         } catch (err) {
-          return this.json({ errors: ["Email address does not exist."] })
+          return this.json({ errors: [err.toString()] })
+          // return this.json({ errors: ["Email address does not exist."] })
         }
         const userCount = await this.repositories.user.loadCount();
 
