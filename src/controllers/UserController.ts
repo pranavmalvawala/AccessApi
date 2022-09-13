@@ -2,7 +2,7 @@ import { controller, httpGet, httpPost } from "inversify-express-utils";
 import express from "express";
 import bcrypt from "bcryptjs";
 import { body, oneOf, validationResult } from "express-validator";
-import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, RegisterUserRequest, Church, EmailPassword } from "../models";
+import { LoginRequest, User, ResetPasswordRequest, LoadCreateUserRequest, RegisterUserRequest, Church, EmailPassword, NewPasswordRequest } from "../models";
 import { AuthenticatedUser } from "../auth";
 import { AccessBaseController } from "./AccessBaseController"
 import { EmailHelper, UserHelper, UniqueIdHelper, Environment } from "../helpers";
@@ -60,8 +60,8 @@ export class UserController extends AccessBaseController {
       else if (req.body.authGuid !== undefined && req.body.authGuid !== "") {
         user = await this.repositories.user.loadByAuthGuid(req.body.authGuid);
         if (user !== null) {
-          user.authGuid = "";
-          await this.repositories.user.save(user);
+          // user.authGuid = "";
+          // await this.repositories.user.save(user);
         }
       } else {
         user = await this.repositories.user.loadByEmail(req.body.email.trim());
@@ -161,8 +161,9 @@ export class UserController extends AccessBaseController {
         user.lastLogin = user.registrationDate;
         const tempPassword = UniqueIdHelper.shortId();
         user.password = bcrypt.hashSync(tempPassword, 10);
+        user.authGuid = v4();
         user = await this.repositories.user.save(user);
-        await UserHelper.sendWelcomeEmail(user.email, tempPassword, null, null);
+        await UserHelper.sendWelcomeEmail(user.email, `/login?auth=${user.authGuid}`, null, null);
       }
       user.password = null;
       return this.json(user, 200);
@@ -181,8 +182,13 @@ export class UserController extends AccessBaseController {
       if (user) return res.status(400).json({ errors: ["user already exists"] });
       else {
         const tempPassword = UniqueIdHelper.shortId();
+        user = { email: register.email, firstName: register.firstName, lastName: register.lastName };
+        user.authGuid = v4();
+        user.registrationDate = new Date();
+        user.password = bcrypt.hashSync(tempPassword, 10);
+
         try {
-          await UserHelper.sendWelcomeEmail(register.email, tempPassword, register.appName, register.appUrl);
+          await UserHelper.sendWelcomeEmail(register.email, `/login?auth=${user.authGuid}`, register.appName, register.appUrl);
 
           if (Environment.emailOnRegistration) {
             const emailBody = "Name: " + register.firstName + " " + register.lastName + "<br/>Email: " + register.email + "<br/>App: " + register.appName;
@@ -194,9 +200,6 @@ export class UserController extends AccessBaseController {
         }
         const userCount = await this.repositories.user.loadCount();
 
-        user = { email: register.email, firstName: register.firstName, lastName: register.lastName };
-        user.registrationDate = new Date();
-        user.password = bcrypt.hashSync(tempPassword, 10);
         user = await this.repositories.user.save(user);
 
         // Add first user to server admins group
@@ -212,7 +215,22 @@ export class UserController extends AccessBaseController {
     });
   }
 
-
+  @httpPost("/setPasswordGuid")
+  public async setPasswordGuid(req: express.Request<{}, {}, NewPasswordRequest>, res: express.Response): Promise<any> {
+    try {
+      const user = await this.repositories.user.loadByAuthGuid(req.body.authGuid);
+      if (user !== null) {
+        user.authGuid = "";
+        const hashedPass = bcrypt.hashSync(req.body.newPassword, 10);
+        user.password = hashedPass
+        await this.repositories.user.save(user);
+        return { success: true };
+      } else return { success: false };
+    } catch (e) {
+      this.logger.error(e);
+      return this.error([e.toString()]);
+    }
+  }
 
   @httpPost("/forgot", body("userEmail").exists().trim().normalizeEmail({ gmail_remove_dots: false }).withMessage("enter a valid email address"))
   public async forgotPassword(req: express.Request<{}, {}, ResetPasswordRequest>, res: express.Response): Promise<any> {
@@ -226,15 +244,9 @@ export class UserController extends AccessBaseController {
       if (user === null) return this.json({ emailed: false }, 200);
       else {
         user.authGuid = v4();
-        const loginLink = this.createLoginLink(user.authGuid);
-        const subject = "Live Church Solutions Password Reset"
-        const contents = "<h2>Reset Password</h2>"
-          + "<h3>Please click the button below to reset your password.</h3>"
-          + `<p><a href="${loginLink}" class="btn btn-primary">Reset Password</a></p>`;
-
         const promises = [];
         promises.push(this.repositories.user.save(user));
-        promises.push(EmailHelper.sendTemplatedEmail(Environment.supportEmail, user.email, null, null, subject, contents));
+        promises.push(UserHelper.sendForgotEmail(user.email, `/login?auth=${user.authGuid}`, req.body.appName, req.body.appUrl));
         await Promise.all(promises);
         return this.json({ emailed: true }, 200);
       }
@@ -304,10 +316,6 @@ export class UserController extends AccessBaseController {
       user.password = null;
       return this.json(user, 200);
     });
-  }
-
-  private createLoginLink(id: string) {
-    return Environment.accountsAppRoot + `/login?auth=${id}&returnUrl=/profile`;
   }
 
 }

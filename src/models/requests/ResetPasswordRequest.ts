@@ -1,3 +1,5 @@
 export type ResetPasswordRequest = {
-    userEmail: string;
+  userEmail: string;
+  appName?: string;
+  appUrl?: string;
 };
