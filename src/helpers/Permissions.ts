@@ -54,17 +54,17 @@ export const permissionsList: IPermission[] = [
   { apiName: "MembershipApi", section: "Group Members", action: "View", displaySection: "Groups", displayAction: "View Group Members" },
   { apiName: "MembershipApi", section: "Households", action: "Edit", displaySection: "People", displayAction: "Edit Households" },
   { apiName: "MembershipApi", section: "Notes", action: "Edit", displaySection: "People", displayAction: "Edit Notes" },
-  { apiName: "MembershipApi", section: "People", action: "Edit", displaySection: "People", displayAction:"Edit People" },
+  { apiName: "MembershipApi", section: "People", action: "Edit", displaySection: "People", displayAction: "Edit People" },
   { apiName: "MembershipApi", section: "People", action: "Edit Self", displaySection: "People", displayAction: "Edit Self" },
   { apiName: "MembershipApi", section: "People", action: "View Members", displaySection: "People", displayAction: "View Members Only" },
   { apiName: "MembershipApi", section: "Notes", action: "View", displaySection: "People", displayAction: "View Notes" },
   { apiName: "MembershipApi", section: "People", action: "View", displaySection: "People", displayAction: "View People" },
-  { apiName: "MessagingApi", section: "Chat", action: "Host", displaySection: "StreamingLive", displayAction: "Host Chat" },
   { apiName: "StreamingLiveApi", section: "Links", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Links" },
   { apiName: "StreamingLiveApi", section: "Pages", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Pages" },
   { apiName: "StreamingLiveApi", section: "Services", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Services" },
   { apiName: "StreamingLiveApi", section: "Settings", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Settings" },
-  { apiName: "StreamingLiveApi", section: "Tabs", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Tabs" }
+  { apiName: "StreamingLiveApi", section: "Tabs", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Tabs" },
+  { apiName: "StreamingLiveApi", section: "Chat", action: "Host", displaySection: "StreamingLive", displayAction: "Host Chat" }
 ]
 
 interface IPermission {

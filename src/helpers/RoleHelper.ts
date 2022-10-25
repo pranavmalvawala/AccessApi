@@ -137,7 +137,7 @@ export class RoleHelper {
 
   private async createStreamingliveRole() {
     const roleId: string = await this.createRole("StreamingLive Admins", [
-      { apiName: "MessagingApi", contentType: "Chat", action: "Host" },
+      { apiName: "StreamingLiveApi", contentType: "Chat", action: "Host" },
       { apiName: "StreamingLiveApi", contentType: "Links", action: "Edit" },
       { apiName: "StreamingLiveApi", contentType: "Pages", action: "Edit" },
       { apiName: "StreamingLiveApi", contentType: "Services", action: "Edit" },
@@ -150,7 +150,7 @@ export class RoleHelper {
 
   private async createStreamingliveHostRole() {
     const roleId: string = await this.createRole("StreamingLive Hosts", [
-      { apiName: "MessagingApi", contentType: "Chat", action: "Host" }
+      { apiName: "StreamingLiveApi", contentType: "Chat", action: "Host" }
     ])
 
     await this.createRoleMember(roleId)
