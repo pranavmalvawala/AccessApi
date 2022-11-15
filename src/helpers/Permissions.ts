@@ -64,7 +64,8 @@ export const permissionsList: IPermission[] = [
   { apiName: "StreamingLiveApi", section: "Services", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Services" },
   { apiName: "StreamingLiveApi", section: "Settings", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Settings" },
   { apiName: "StreamingLiveApi", section: "Tabs", action: "Edit", displaySection: "StreamingLive", displayAction: "Edit Tabs" },
-  { apiName: "StreamingLiveApi", section: "Chat", action: "Host", displaySection: "StreamingLive", displayAction: "Host Chat" }
+  { apiName: "StreamingLiveApi", section: "Chat", action: "Host", displaySection: "StreamingLive", displayAction: "Host Chat" },
+  { apiName: "ContentApi", section: "Links", action: "Edit", displaySection: "Website", displayAction: "Edit Links" }
 ]
 
 interface IPermission {
@@ -83,7 +84,8 @@ export type ApiName =
   | "GivingApi"
   | "AttendanceApi"
   | "MessagingApi"
-  | "LessonsApi";
+  | "LessonsApi"
+  | "ContentApi";
 
 export type DisplaySection =
   | "Access"
@@ -95,7 +97,8 @@ export type DisplaySection =
   | "Donations"
   | "Attendance"
   | "Lessons"
-  | "Forms";
+  | "Forms"
+  | "Website";
 
 export type ContentType =
   | "Roles"

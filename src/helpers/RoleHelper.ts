@@ -17,6 +17,7 @@ export class RoleHelper {
     await this.createLessonsRole()
     await this.createStreamingliveRole()
     await this.createStreamingliveHostRole()
+    await this.createWebsiteAdminRole()
   }
 
   private async createRole(name: string, permissions: RolePermission[]): Promise<string> {
@@ -130,6 +131,14 @@ export class RoleHelper {
   private async createLessonsRole() {
     const roleId: string = await this.createRole("Lessons Admins", [
       { apiName: "LessonsApi", contentType: "Schedules", action: "Edit" }
+    ])
+
+    await this.createRoleMember(roleId)
+  }
+
+  private async createWebsiteAdminRole() {
+    const roleId: string = await this.createRole("Website Admins", [
+      { apiName: "ContentApi", contentType: "Links", action: "Edit" }
     ])
 
     await this.createRoleMember(roleId)
