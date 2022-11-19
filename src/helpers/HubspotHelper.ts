@@ -8,7 +8,7 @@ export class HubspotHelper {
   static register = async (companyName: string, firstName: string, lastName: string, address: string, city: string, state: string, zip: string, email: string, initialApp: string) => {
     if (Environment.hubspotKey) {
       const hubspot = require('@hubspot/api-client')
-      //const client = new hubspot.Client({ apiKey: Environment.hubspotKey })
+      // const client = new hubspot.Client({ apiKey: Environment.hubspotKey })
       const client = new hubspot.Client({ accessToken: Environment.hubspotKey })
 
       const company: Hubspot.companiesModels.SimplePublicObjectInput = {
